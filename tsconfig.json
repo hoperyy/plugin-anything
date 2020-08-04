@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es6",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        //"noImplicitAny": false,
+        //"sourceMap": true,
+        "allowJs": true,
+        //"outDir": "target",
+        "inlineSourceMap": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true
+        //"inlineSources": true
+    },
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}

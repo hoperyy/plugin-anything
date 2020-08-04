@@ -1,0 +1,22 @@
+{
+  "name": "plugin-anything",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "tsc:watch": "tsc -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoperyy/plugin-anything.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hoperyy/plugin-anything/issues"
+  },
+  "homepage": "https://github.com/hoperyy/plugin-anything#readme",
+  "devDependencies": {
+    "typescript": "^3.9.7"
+  }
+}
