@@ -20,7 +20,7 @@ init(
             // flush hooks
             await context.hooks.done.flush();
 
-            return context.rollupConfig;
+            console.log('do something');
         }
     }
 );
