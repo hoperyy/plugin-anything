@@ -9,9 +9,11 @@ const { runPluginAnything } = require('plugin-anything');
 
 runPluginAnything(
     {
-        searchList: [],
+        // search plugin list
+        searchList: [
+            // String: absolute folder path
+        ],
 
-        // plugins: Array<String | Function>
         plugins: [
             // String | FunctionContructor | Array<String | FunctionContructor, object>
         ],
