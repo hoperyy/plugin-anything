@@ -1,7 +1,7 @@
 
 import { run } from '../core/index';
 
-export const run = async (userOptions) => {
+export const runPluginAnything = async (userOptions) => {
 
     run(userOptions, {
         async hooks({ hooks, Events }) {

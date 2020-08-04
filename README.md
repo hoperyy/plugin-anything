@@ -5,9 +5,9 @@ Make pluginable applications.
 # Usage
 
 ```js
-const { runPluginAnything } = require('plugin-anything');
+const { run } = require('plugin-anything');
 
-runPluginAnything(
+run(
     {
         // search plugin list
         searchList: [
