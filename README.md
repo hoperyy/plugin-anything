@@ -33,3 +33,7 @@ runPluginAnything(
     }
 );
 ```
+
+# LICENSE
+
+MIT
