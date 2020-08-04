@@ -23,6 +23,20 @@ export class Events {
                 }
                 break;
 
+            case 'bail':
+                {
+                    const promises = [];
+                    for (let i = 0, len = this.eventList.length; i < len; i++) {
+                        const { callback, name } = this.eventList[i];
+                        promises.push(new Promise((resolve, reject) => {
+                            resolve(callback(name));
+                        }));
+                    }
+
+                    await Promise.all(promises);
+                }
+                break;
+
             default:
                 console.log(`[plugin-anything] flush type "${type}" is not supported.`);
                 break;
