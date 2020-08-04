@@ -111,7 +111,7 @@ export class PluginAnything {
         return standardOutput;
     }
 
-    public async flushPlugins() {
+    private async flushPlugins() {
         const plugins: typePluginPresetOutputArray = this.getPluginList();
 
         const promises = plugins.map(async ({ Fn, options }) => {
@@ -123,6 +123,6 @@ export class PluginAnything {
     }
 }
 
-export function runPluginAnything(initOptions, callbacks) {
+export function run(initOptions, callbacks) {
     return new PluginAnything(initOptions, callbacks);
 }
