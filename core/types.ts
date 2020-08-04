@@ -1,8 +1,3 @@
-interface typeEventInstance {
-    tap(name: string, callback: Function): void;
-    call(): void
-}
-
 export interface typeInitOptions {
     rootPath?: string;
     searchList?: Array<string>;
@@ -14,11 +9,6 @@ export interface typeInitCallbacks {
     hooks(any): any;
     bootstrap(any): any;
 }
-
-// export interface typeHooks {
-//     onRollupConfig: typeEventInstance;
-//     afterRollupConfig: typeEventInstance;
-// };
 
 export interface typeUserConfig {
     plugins?: Array<string | Array<any>>,
@@ -33,7 +23,7 @@ export interface typeUtils {
 
 export type typePluginPresetInputArray = Array<typeStandardPluginPresetInputItem>;
 
-export type typePluginPresetOutputArray = Array<typeStandardPluginPresetOutputItem>;
+export type typePluginPresetOutputArray = Array<typeStandardPluginPresetModuleItem>;
 
 export type typePluginPresetUserItem = string | Array<any> | Function;
 
@@ -74,6 +64,11 @@ export interface typeRollupConfig {
 export interface typeOuterContext {
     hooks: object;
     Events: Function
+}
+
+export interface typeStandardPluginPresetInputItem {
+    name: string | Function;
+    options: object;
 }
 
 export interface typeStandardPluginPresetModuleItem {

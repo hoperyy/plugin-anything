@@ -1,3 +1,5 @@
+type flushTypes = 'waterfall' | 'bail';
+
 export class Events {
     constructor() {
 
@@ -12,7 +14,7 @@ export class Events {
         });
     }
 
-    async flush(type = 'waterfall') {
+    async flush(type: flushTypes = 'waterfall') {
         switch(type) {
             case 'waterfall':
                 {
