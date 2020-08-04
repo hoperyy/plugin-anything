@@ -1,16 +1,14 @@
 
-import { init } from '../core/index';
+import { runPluginAnything } from '../core/index';
 
 export const run = (userOptions) => {
-    init(userOptions, {
-        registHooks(context) {
-            context.hooks.done = new context.utils.Events();
+    runPluginAnything(userOptions, {
+        async hooks({ hooks, Events }) {
+            hooks.done = new Events();
         },
-        async bootstrap(context) {
+        async bootstrap({ hooks, Events }) {
             // flush hooks
-            await context.hooks.done.flush();
-
-            return context.rollupConfig;
+            await hooks.done.flush('waterfall');
         }
     });
 };

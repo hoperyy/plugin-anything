@@ -1,22 +1,16 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-// import * as gulp from 'gulp';
 import { Events } from './events';
 import { typeInitOptions, typeUtils, typeStandardPluginPresetModuleItem, typePluginPresetUserItem, typeOuterContext, typePluginPresetInputArray, typePluginPresetOutputArray, typeInitCallbacks } from './types';
 
-// generate entries
-
-// build files inside packages
-
-// build index.js
-class Core {
+export class PluginAnything {
     constructor(options: typeInitOptions = {}, callbackMap: typeInitCallbacks) {
         this.options = { ...this.options, ...options };
 
         (async () => {
-            await callbackMap.registHooks(this.outerContext);
-            await this.runPlugins();
+            await callbackMap.hooks(this.outerContext);
+            await this.flushPlugins();
             await callbackMap.bootstrap(this.outerContext);
         })();
     }
@@ -35,23 +29,20 @@ class Core {
 
     private outerContext: typeOuterContext = {
         hooks: {},
-
-        utils: {
-            Events
-        },
+        Events,
     }
 
     private options: typeInitOptions = {
         searchList: [],
         plugins: [],
-        presets: []
+        presets: [],
     };
 
     private getPluginList(): typePluginPresetOutputArray {
         const { plugins: pluginNames, presets: presetNames } = this.options;
 
         // search plugin/presets entries
-        const standardPluginList: typePluginPresetInputArray = pluginNames.map(name => this.findModule(name, 'plugin' )).filter(item => !!item);
+        const standardPluginList: typePluginPresetInputArray = pluginNames.map(name => this.findModule(name, 'plugin')).filter(item => !!item);
         // const standardPresetList: typePluginPresetInputArray = pluginNames.map(name => this.findModule(name, 'preset')).filter(item => !!item);
 
         const pluginConstructors = standardPluginList.map(({ Fn, options }) => {
@@ -70,7 +61,7 @@ class Core {
         // format input
         let standardInput = null;
 
-        const { isString, isArray, isFunction} = this.utils;
+        const { isString, isArray, isFunction } = this.utils;
 
         if (isString(input)) {
             standardInput = {
@@ -120,10 +111,10 @@ class Core {
         return standardOutput;
     }
 
-    private async runPlugins() {
+    public async flushPlugins() {
         const plugins: typePluginPresetOutputArray = this.getPluginList();
 
-        const promises = plugins.map(async ( { Fn, options } ) => {
+        const promises = plugins.map(async ({ Fn, options }) => {
             const plugin = new Fn(options);
             plugin.apply && await plugin.apply(this.outerContext);
         });
@@ -132,6 +123,6 @@ class Core {
     }
 }
 
-export function init (initOptions, callbacks) {
-    return new Core(initOptions, callbacks);
+export function runPluginAnything(initOptions, callbacks) {
+    return new PluginAnything(initOptions, callbacks);
 }

@@ -11,7 +11,7 @@ export interface typeInitOptions {
 }
 
 export interface typeInitCallbacks {
-    registHooks(any): any;
+    hooks(any): any;
     bootstrap(any): any;
 }
 
@@ -73,9 +73,7 @@ export interface typeRollupConfig {
 
 export interface typeOuterContext {
     hooks: object;
-    utils: {
-        WaterfallEvents: Function
-    },
+    Events: Function
 }
 
 export interface typeStandardPluginPresetModuleItem {
