@@ -3,10 +3,10 @@ import { runPluginAnything } from '../core/index';
 
 export const run = async (userOptions) => {
     runPluginAnything(userOptions, {
-        async hooks({ hooks, Events }) {
+        async init({ hooks, Events, customs }) {
             hooks.done = new Events();
         },
-        async bootstrap({ hooks, Events }) {
+        async bootstrap({ hooks, Events, customs }) {
             // flush hooks
             await hooks.done.flush('waterfall');
         }

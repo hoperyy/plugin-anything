@@ -5,32 +5,37 @@ Make pluginable applications.
 # Usage
 
 ```js
-const { run } = require('plugin-anything');
+const { runPluginAnything } = require('plugin-anything');
 
-run(
+runPluginAnything(
     {
-        // search plugin list
+        // Array< string >
         searchList: [
-            // String: absolute folder path
+            // string: absolute folder path
         ],
 
+        // Array< string | FunctionContructor | Array<string | FunctionContructor, object> >
         plugins: [
-            // String | FunctionContructor | Array<String | FunctionContructor, object>
+            // string: plugin name
+            // FunctionContructor: Plugin Constructor
+            // Array: [ string | FunctionContructor, options object ]
         ],
     }, 
     {
-        // regist hooks
-        async hooks({ hooks, Events }) {
+        // init something like: hooks, customs config
+        async init({ hooks, Events, customs }) {
             hooks.done = new Events();
+            customs.myConfig = {};
         },
 
         // run bootstrap
-        async bootstrap({ hooks, Events }) {
+        async bootstrap({ hooks, Events, customs }) {
             // flush hooks
             await hooks.done.flush('waterfall');
 
             // do something
             // ...
+            // console.log(customs.myConfig);
         }
     }
 );
