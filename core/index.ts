@@ -2,14 +2,14 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import { Events } from './events';
-import { typeInitOptions, typeUtils, typeStandardPluginPresetModuleItem, typePluginPresetUserItem, typeOuterContext, typePluginPresetInputArray, typePluginPresetOutputArray, typeInitCallbacks } from './types';
+import { typeInitOptions, typeUtils, typeStandardPluginPresetItem, typePluginPresetUserItem, typeOuterContext, typePluginPresetArray, typeInitCallbacks } from './types';
 
 export class PluginAnything {
     constructor(options: typeInitOptions = {}, callbackMap: typeInitCallbacks) {
         this.options = { ...this.options, ...options };
 
         (async () => {
-            await callbackMap.hooks(this.outerContext);
+            await callbackMap.init(this.outerContext);
             await this.flushPlugins();
             await callbackMap.bootstrap(this.outerContext);
         })();
@@ -30,6 +30,7 @@ export class PluginAnything {
     private outerContext: typeOuterContext = {
         hooks: {},
         Events,
+        customs: {},
     }
 
     private options: typeInitOptions = {
@@ -38,12 +39,11 @@ export class PluginAnything {
         presets: [],
     };
 
-    private getPluginList(): typePluginPresetOutputArray {
+    private getPluginList(): typePluginPresetArray {
         const { plugins: pluginNames, presets: presetNames } = this.options;
 
         // search plugin/presets entries
-        const standardPluginList: typePluginPresetInputArray = pluginNames.map(name => this.findModule(name, 'plugin')).filter(item => !!item);
-        // const standardPresetList: typePluginPresetInputArray = pluginNames.map(name => this.findModule(name, 'preset')).filter(item => !!item);
+        const standardPluginList: typePluginPresetArray = pluginNames.map(name => this.findModule(name, 'plugin')).filter(item => !!item);
 
         const pluginConstructors = standardPluginList.map(({ Fn, options }) => {
             return {
@@ -55,7 +55,7 @@ export class PluginAnything {
         return pluginConstructors;
     };
 
-    private findModule(input: typePluginPresetUserItem, tag: 'plugin' | 'preset'): typeStandardPluginPresetModuleItem {
+    private findModule(input: typePluginPresetUserItem, tag: 'plugin' | 'preset'): typeStandardPluginPresetItem {
         let standardOutput = null;
 
         // format input
@@ -112,7 +112,7 @@ export class PluginAnything {
     }
 
     private async flushPlugins() {
-        const plugins: typePluginPresetOutputArray = this.getPluginList();
+        const plugins: typePluginPresetArray = this.getPluginList();
 
         const promises = plugins.map(async ({ Fn, options }) => {
             const plugin = new Fn(options);
@@ -123,6 +123,22 @@ export class PluginAnything {
     }
 }
 
-export function run(initOptions, callbacks) {
+export function runPluginAnything(initOptions, callbacks) {
     return new PluginAnything(initOptions, callbacks);
 }
+
+// export async function utilGetConfigFromFolder(configFilePath: string) {
+//     const finalConfig = {
+//         plugins: [],
+//     };
+
+//     if (!configFilePath || !fs.existsSync(configFilePath)) {
+//         return finalConfig;
+//     }
+
+//     try {
+//         const userConfig = await require(configFilePath);
+//     } catch(error) {
+
+//     }
+// }

@@ -1,9 +1,8 @@
 
-import { run } from '../core/index';
+import { runPluginAnything } from '../core/index';
 
-export const runPluginAnything = async (userOptions) => {
-
-    run(userOptions, {
+export const run = async (userOptions) => {
+    runPluginAnything(userOptions, {
         async hooks({ hooks, Events }) {
             hooks.done = new Events();
         },

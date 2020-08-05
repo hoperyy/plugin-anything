@@ -1,12 +1,11 @@
 export interface typeInitOptions {
-    rootPath?: string;
     searchList?: Array<string>;
     plugins?: Array<string | Array<any>>;
     presets?: Array<string | Array<any>>;
 }
 
 export interface typeInitCallbacks {
-    hooks(any): any;
+    init(any): any;
     bootstrap(any): any;
 }
 
@@ -21,9 +20,7 @@ export interface typeUtils {
     isFunction(param: any): boolean;
 }
 
-export type typePluginPresetInputArray = Array<typeStandardPluginPresetInputItem>;
-
-export type typePluginPresetOutputArray = Array<typeStandardPluginPresetModuleItem>;
+export type typePluginPresetArray = Array<typeStandardPluginPresetItem>;
 
 export type typePluginPresetUserItem = string | Array<any> | Function;
 
@@ -63,15 +60,11 @@ export interface typeRollupConfig {
 
 export interface typeOuterContext {
     hooks: object;
-    Events: Function
+    Events: Function,
+    customs: object,
 }
 
-export interface typeStandardPluginPresetInputItem {
-    name: string | Function;
-    options: object;
-}
-
-export interface typeStandardPluginPresetModuleItem {
+export interface typeStandardPluginPresetItem {
     Fn(options: object): void;
     options: object;
 }

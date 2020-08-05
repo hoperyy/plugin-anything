@@ -5,13 +5,10 @@ export class Events {
 
     }
 
-    eventList: Array< { name: string; callback: Function } > = [];
+    eventList: Array< Function > = [];
 
-    tap(name: string, callback: Function) {
-        this.eventList.push({
-            name,
-            callback
-        });
+    tap(callback: Function) {
+        this.eventList.push(callback);
     }
 
     async flush(type: flushTypes = 'waterfall') {
@@ -19,8 +16,8 @@ export class Events {
             case 'waterfall':
                 {
                     for (let i = 0, len = this.eventList.length; i < len; i++) {
-                        const { callback, name } = this.eventList[i];
-                        await callback(name);
+                        const callback = this.eventList[i];
+                        await callback();
                     }
                 }
                 break;
@@ -29,9 +26,9 @@ export class Events {
                 {
                     const promises = [];
                     for (let i = 0, len = this.eventList.length; i < len; i++) {
-                        const { callback, name } = this.eventList[i];
+                        const callback = this.eventList[i];
                         promises.push(new Promise((resolve, reject) => {
-                            resolve(callback(name));
+                            resolve(callback());
                         }));
                     }
 

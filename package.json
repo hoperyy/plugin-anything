@@ -2,7 +2,7 @@
   "name": "plugin-anything",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "core/index.js",
   "scripts": {
     "tsc:watch": "tsc -w"
   },
