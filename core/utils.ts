@@ -2,7 +2,7 @@
  * @param {Any} value
  * @returns {string}
  */
-function getType(value) {
+function getType(value): string {
   return Object.prototype.toString.call(value).slice(8, -1).toLowerCase();
 }
 
@@ -10,7 +10,7 @@ function getType(value) {
  * @param {Any} value
  * @returns {Boolean}
  */
-function isArray(value) {
+function isArray(value): boolean {
   return getType(value) === 'array';
 }
 
@@ -18,7 +18,7 @@ function isArray(value) {
  * @param {Any} value
  * @returns {Boolean}
  */
-function isString(value) {
+function isString(value): boolean {
   return getType(value) === 'string';
 }
 
@@ -26,7 +26,7 @@ function isString(value) {
  * @param {Any} value
  * @returns {Boolean}
  */
-function isFunction(value) {
+function isFunction(value): boolean {
   return getType(value) === 'function';
 }
 

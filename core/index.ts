@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import { Events } from './events';
-import { isArray, isString, isFunction } from './utils';
+import { getType, isArray, isString, isFunction } from './utils';
 import { typeInitOptions, typeStandardPluginPresetItem, typePluginPresetUserItem, typeOuterContext, typePluginPresetArray, typeInitCallbacks } from './types';
 
 export class PluginAnything {
@@ -29,10 +29,10 @@ export class PluginAnything {
     };
 
     private getPluginList(): typePluginPresetArray {
-        const { plugins: pluginNames, presets: presetNames } = this.options;
+        const { plugins: pluginNameList, presets: presetNameList } = this.options;
 
         // search plugin/presets entries
-        const standardPluginList: typePluginPresetArray = pluginNames.map(name => this.findModule(name, 'plugin')).filter(item => !!item);
+        const standardPluginList: typePluginPresetArray = pluginNameList.map(name => this.findModule(name, 'plugin')).filter(item => !!item);
 
         const pluginConstructors = standardPluginList.map(({ Fn, options }) => {
             return {
@@ -47,25 +47,43 @@ export class PluginAnything {
     private findModule(input: typePluginPresetUserItem, tag: 'plugin' | 'preset'): typeStandardPluginPresetItem {
         let standardOutput = null;
 
-        // format input
-        let standardInput = null;
+        const type = getType(input)
 
-        if (isString(input)) {
-            standardInput = {
+        // use strategy pattern optimize code
+        const standardInputStrats = {
+            string: {
                 name: input as string,
                 options: {}
-            };
-        } else if (isArray(input)) {
-            standardInput = {
+            },
+            array: {
                 name: input[0],
                 options: input[1] || {}
-            };
-        } else if (isFunction(input)) {
-            standardInput = {
+            },
+            function: {
                 name: input as Function,
                 options: {}
-            };
+            }
         }
+
+        // format input
+        // let standardInput = null;
+        // if (isString(input)) {
+        //     standardInput = {
+        //         name: input as string,
+        //         options: {}
+        //     };
+        // } else if (isArray(input)) {
+        //     standardInput = {
+        //         name: input[0],
+        //         options: input[1] || {}
+        //     };
+        // } else if (isFunction(input)) {
+        //     standardInput = {
+        //         name: input as Function,
+        //         options: {}
+        //     };
+        // }
+        let standardInput = standardInputStrats[type] || null
 
         if (!standardInput) {
             return null;
