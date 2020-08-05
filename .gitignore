@@ -6,3 +6,4 @@ npm-debug.log
 *.swp
 core/**/*.js
 demo/**/*.js
+package-lock.json

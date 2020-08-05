@@ -2,7 +2,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import { Events } from './events';
-import { typeInitOptions, typeUtils, typeStandardPluginPresetItem, typePluginPresetUserItem, typeOuterContext, typePluginPresetArray, typeInitCallbacks } from './types';
+import { isArray, isString, isFunction } from './utils';
+import { typeInitOptions, typeStandardPluginPresetItem, typePluginPresetUserItem, typeOuterContext, typePluginPresetArray, typeInitCallbacks } from './types';
 
 export class PluginAnything {
     constructor(options: typeInitOptions = {}, callbackMap: typeInitCallbacks) {
@@ -13,18 +14,6 @@ export class PluginAnything {
             await this.flushPlugins();
             await callbackMap.lifecycle(this.outerContext);
         })();
-    }
-
-    utils: typeUtils = {
-        isArray(param: any): boolean {
-            return Object.prototype.toString.call(param) === '[object Array]';
-        },
-        isString(param: any): boolean {
-            return Object.prototype.toString.call(param) === '[object String]';
-        },
-        isFunction(param: any): boolean {
-            return Object.prototype.toString.call(param) === '[object Function]';
-        }
     }
 
     private outerContext: typeOuterContext = {
@@ -60,8 +49,6 @@ export class PluginAnything {
 
         // format input
         let standardInput = null;
-
-        const { isString, isArray, isFunction } = this.utils;
 
         if (isString(input)) {
             standardInput = {
