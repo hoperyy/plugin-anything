@@ -11,7 +11,7 @@ export class PluginAnything {
         (async () => {
             await callbackMap.init(this.outerContext);
             await this.flushPlugins();
-            await callbackMap.bootstrap(this.outerContext);
+            await callbackMap.lifecycle(this.outerContext);
         })();
     }
 

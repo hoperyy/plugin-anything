@@ -6,7 +6,7 @@ export const run = async (userOptions) => {
         async init({ hooks, Events, customs }) {
             hooks.done = new Events();
         },
-        async bootstrap({ hooks, Events, customs }) {
+        async lifecycle({ hooks, Events, customs }) {
             // flush hooks
             await hooks.done.flush('waterfall');
         }

@@ -6,7 +6,7 @@ export interface typeInitOptions {
 
 export interface typeInitCallbacks {
     init(any): any;
-    bootstrap(any): any;
+    lifecycle(any): any;
 }
 
 export interface typeUserConfig {

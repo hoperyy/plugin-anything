@@ -1,6 +1,6 @@
 {
   "name": "plugin-anything",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "core/index.js",
   "scripts": {

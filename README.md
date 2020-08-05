@@ -28,8 +28,8 @@ runPluginAnything(
             customs.myConfig = {};
         },
 
-        // run bootstrap
-        async bootstrap({ hooks, Events, customs }) {
+        // run lifecycle
+        async lifecycle({ hooks, Events, customs }) {
             // flush hooks
             await hooks.done.flush('waterfall');
 
