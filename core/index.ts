@@ -47,7 +47,7 @@ export class PluginAnything {
     private findModule(input: typePluginPresetUserItem, tag: 'plugin' | 'preset'): typeStandardPluginPresetItem {
         let standardOutput = null;
 
-        const type = getType(input)
+        const type = getType(input);
 
         // use strategy pattern optimize code
         const standardInputStrats = {
@@ -65,25 +65,7 @@ export class PluginAnything {
             }
         }
 
-        // format input
-        // let standardInput = null;
-        // if (isString(input)) {
-        //     standardInput = {
-        //         name: input as string,
-        //         options: {}
-        //     };
-        // } else if (isArray(input)) {
-        //     standardInput = {
-        //         name: input[0],
-        //         options: input[1] || {}
-        //     };
-        // } else if (isFunction(input)) {
-        //     standardInput = {
-        //         name: input as Function,
-        //         options: {}
-        //     };
-        // }
-        let standardInput = standardInputStrats[type] || null
+        let standardInput = standardInputStrats[type] || null;
 
         if (!standardInput) {
             return null;
