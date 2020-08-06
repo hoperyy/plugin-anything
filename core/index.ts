@@ -114,19 +114,3 @@ export class PluginAnything {
 export function runPluginAnything(initOptions, callbacks) {
     return new PluginAnything(initOptions, callbacks);
 }
-
-// export async function utilGetConfigFromFolder(configFilePath: string) {
-//     const finalConfig = {
-//         plugins: [],
-//     };
-
-//     if (!configFilePath || !fs.existsSync(configFilePath)) {
-//         return finalConfig;
-//     }
-
-//     try {
-//         const userConfig = await require(configFilePath);
-//     } catch(error) {
-
-//     }
-// }
