@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import { Events } from './events';
-import { getType, isString, isFunction } from './utils';
+import { getType, isArray, isString, isFunction } from './utils';
 import { typeInitOptions, typeStandardPluginPresetItem, typePluginPresetUserItem, typeOuterContext, typePluginPresetArray, typeInitCallbacks } from './types';
 
 export class PluginAnything {
@@ -56,7 +56,7 @@ export class PluginAnything {
                 options: {}
             },
             array: {
-                name: input[0],
+                name: isArray(input) && input[0],
                 options: input[1] || {}
             },
             function: {
@@ -100,6 +100,7 @@ export class PluginAnything {
             for (let i = 0, len = this.options.searchList.length; i < len; i++) {
                 const curSearchPath: string = this.options.searchList[i];
                 const moduleName: string = standardInput.name; // standardInput.name.indexOf(prefix) === -1 ? `${prefix}${standardInput.name}` : standardInput.name;
+                // get total path
                 const modulePath: string = path.join(curSearchPath, moduleName, 'index.js');
 
                 if (fs.existsSync(modulePath)) {
