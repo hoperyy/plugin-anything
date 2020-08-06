@@ -100,7 +100,7 @@ export class PluginAnything {
             for (let i = 0, len = this.options.searchList.length; i < len; i++) {
                 const curSearchPath: string = this.options.searchList[i];
                 const moduleName: string = standardInput.name; // standardInput.name.indexOf(prefix) === -1 ? `${prefix}${standardInput.name}` : standardInput.name;
-                // get total path
+                // get absolute path
                 const modulePath: string = path.join(curSearchPath, moduleName, 'index.js');
 
                 if (fs.existsSync(modulePath)) {
