@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import { Events } from './events';
-import { getType, isArray, isString, isFunction } from './utils';
+import { getType, isString, isFunction } from './utils';
 import { typeInitOptions, typeStandardPluginPresetItem, typePluginPresetUserItem, typeOuterContext, typePluginPresetArray, typeInitCallbacks } from './types';
 
 export class PluginAnything {
