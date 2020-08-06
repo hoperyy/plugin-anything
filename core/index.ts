@@ -65,25 +65,7 @@ export class PluginAnything {
             }
         }
 
-        // format input
-        // let standardInput = null;
-        // if (isString(input)) {
-        //     standardInput = {
-        //         name: input as string,
-        //         options: {}
-        //     };
-        // } else if (isArray(input)) {
-        //     standardInput = {
-        //         name: input[0],
-        //         options: input[1] || {}
-        //     };
-        // } else if (isFunction(input)) {
-        //     standardInput = {
-        //         name: input as Function,
-        //         options: {}
-        //     };
-        // }
-        let standardInput = standardInputStrats[type] || null
+        let standardInput = standardInputStrats[type] || null;
 
         if (!standardInput) {
             return null;
@@ -132,19 +114,3 @@ export class PluginAnything {
 export function runPluginAnything(initOptions, callbacks) {
     return new PluginAnything(initOptions, callbacks);
 }
-
-// export async function utilGetConfigFromFolder(configFilePath: string) {
-//     const finalConfig = {
-//         plugins: [],
-//     };
-
-//     if (!configFilePath || !fs.existsSync(configFilePath)) {
-//         return finalConfig;
-//     }
-
-//     try {
-//         const userConfig = await require(configFilePath);
-//     } catch(error) {
-
-//     }
-// }
