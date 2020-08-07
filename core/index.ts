@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import { Events } from './events';
-import { getType, isArray, isString, isFunction } from './utils';
+import { toRawType, isArray, isString, isFunction } from './utils';
 import { typeInitOptions, typeStandardPluginPresetItem, typePluginPresetUserItem, typeOuterContext, typePluginPresetArray, typeInitCallbacks } from './types';
 
 export class PluginAnything {
@@ -47,7 +47,7 @@ export class PluginAnything {
     private findModule(input: typePluginPresetUserItem, tag: 'plugin' | 'preset'): typeStandardPluginPresetItem {
         let standardOutput = null;
 
-        const type = getType(input);
+        const type = toRawType(input)
 
         // use strategy pattern optimize code
         const standardInputStrats = {
