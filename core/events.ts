@@ -5,14 +5,19 @@ export class Events {
 
     }
 
-    eventList: Array< Function > = [];
+    eventList: Array<Function> = [];
 
     tap(callback: Function) {
         this.eventList.push(callback);
     }
 
+    // clear eventList
+    clear() {
+        this.eventList = []
+    }
+
     async flush(type: flushTypes = 'waterfall') {
-        switch(type) {
+        switch (type) {
             case 'waterfall':
                 {
                     for (let i = 0, len = this.eventList.length; i < len; i++) {
