@@ -46,11 +46,44 @@ function isPlainObject(value): boolean {
   return toRawType(value) === 'object';
 }
 
+/**
+ * @description 串行执行
+ * @param {Object} obj
+ * @returns {Boolean}
+ */
+async function waterfallRun(obj: { [name: string]: Function }) {
+  for (const name in obj) {
+    const callback = obj[name];
+    await callback();
+  }
+}
+
+/**
+ * @description 并行执行
+ * @param {Object} obj
+ * @returns {Boolean}
+ */
+async function parallelRun(obj: { [name: string]: Function }) {
+  const promises = [];
+  for (const name in obj) {
+    // get callback
+    const callback = obj[name];
+    
+    promises.push(new Promise(resolve => {
+      resolve(callback());
+    }))
+  }
+
+  await Promise.all(promises);
+}
+
 export {
   toRawType,
   isArray,
   isString,
   isFunction,
   isObject,
-  isPlainObject
+  isPlainObject,
+  waterfallRun,
+  parallelRun
 }
