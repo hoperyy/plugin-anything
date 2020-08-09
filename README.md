@@ -9,9 +9,6 @@ const { runPluginAnything } = require('plugin-anything');
 
 runPluginAnything(
     {
-        
-    }, 
-    {
         /** options **/
 
         // Array< string >
