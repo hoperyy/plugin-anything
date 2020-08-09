@@ -22,7 +22,7 @@ export class PluginAnything {
         customs: {},
     }
 
-    private options: typeInitOptions = {
+    private readonly options: typeInitOptions = {
         searchList: [],
         plugins: [],
         presets: [],
