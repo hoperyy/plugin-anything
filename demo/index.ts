@@ -32,13 +32,11 @@ runPluginAnything(
             MyPlugin__A,
 
             [ MyPlugin__B, { name: 'bbb' } ]
-        ]
-    }, 
-    {
-        async init({ hooks, Events, customs }) {
+        ],
+        async onInit({ hooks, Events, customs }) {
             hooks.done = new Events();
         },
-        async lifecycle({ hooks, Events, customs }) {
+        async onLifecycle({ hooks, Events, customs }) {
             // flush hooks
             await hooks.done.flush('waterfall');
         }

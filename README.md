@@ -9,7 +9,14 @@ const { runPluginAnything } = require('plugin-anything');
 
 runPluginAnything(
     {
+        
+    }, 
+    {
+        /** options **/
+
         // Array< string >
+        // search plugins when plugin name is string
+        // Array item should be absolute folder path
         searchList: [
             // string: absolute folder path
         ],
@@ -20,16 +27,18 @@ runPluginAnything(
             // FunctionContructor: Plugin Constructor
             // Array: [ string | FunctionContructor, options object ]
         ],
-    }, 
-    {
+
+
+        /** callbacks **/
+
         // init something like: hooks, customs config
-        async init({ hooks, Events, customs }) {
+        async onInit({ hooks, Events, customs }) {
             hooks.done = new Events();
             customs.myConfig = {};
         },
 
         // run lifecycle
-        async lifecycle({ hooks, Events, customs }) {
+        async onLifecycle({ hooks, Events, customs }) {
             // flush hooks
             await hooks.done.flush('waterfall');
 
@@ -74,13 +83,11 @@ runPluginAnything(
             MyPlugin__A,
 
             [ MyPlugin__B, { name: 'bbb' } ]
-        ]
-    }, 
-    {
-        async init({ hooks, Events, customs }) {
+        ],
+        async onInit({ hooks, Events, customs }) {
             hooks.done = new Events();
         },
-        async lifecycle({ hooks, Events, customs }) {
+        async onLifecycle({ hooks, Events, customs }) {
             // clear hook done
             // await hooks.done.clear();
 
