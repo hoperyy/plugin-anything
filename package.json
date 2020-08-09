@@ -4,7 +4,8 @@
   "description": "",
   "main": "core/index.js",
   "scripts": {
-    "tsc:watch": "tsc -w"
+    "tsc:watch": "tsc -w",
+    "dev": "node demo/index"
   },
   "repository": {
     "type": "git",

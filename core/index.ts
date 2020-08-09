@@ -5,6 +5,8 @@ import { Events } from './events';
 import { toRawType, isArray, isString, isFunction } from './utils';
 import { typeInitOptions, typeStandardPluginPresetItem, typePluginPresetUserItem, typeOuterContext, typePluginPresetArray, typeInitCallbacks } from './types';
 
+const undefined = void 0;
+
 export class PluginAnything {
     constructor(options: typeInitOptions = {}, callbackMap: typeInitCallbacks) {
         this.options = { ...this.options, ...options };
@@ -50,28 +52,26 @@ export class PluginAnything {
         const type = toRawType(input)
 
         // use strategy pattern optimize code
-        const standardInputStrats = {
-            string: {
-                name: input as string,
+        const standardInputMap = {
+            'string': {
+                name: isString(input) ? input : undefined,
                 options: {}
             },
-            array: {
-                name: isArray(input) && input[0],
+            'array': {
+                name: isArray(input) ? input[0] : undefined,
                 options: input[1] || {}
             },
-            function: {
-                name: input as Function,
+            'function': {
+                name: isFunction(input) ? input : undefined,
                 options: {}
             }
         }
 
-        let standardInput = standardInputStrats[type] || null;
+        let standardInput = standardInputMap[type] || null;
 
         if (!standardInput) {
             return null;
         }
-
-        // const prefix = `plugined-rollup-scaffold-${tag}-`;
 
         if (isFunction(standardInput.name)) {
             standardOutput = {

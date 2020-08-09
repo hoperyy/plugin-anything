@@ -1,19 +1,39 @@
 type flushTypes = 'waterfall' | 'bail';
 
+type eventListType = Array< { name: string, callback: Function } >;
+
 export class Events {
     constructor() {
 
     }
 
-    eventList: Array<Function> = [];
+    eventList: eventListType = [];
 
-    tap(callback: Function) {
-        this.eventList.push(callback);
+    tap(name: string, callback: Function): any {
+        this.eventList.push({
+            name,
+            callback
+        });
     }
 
     // clear eventList
-    clear() {
-        this.eventList = []
+    clear(eventName?: string) {
+        if (!eventName) {
+            this.eventList = [];
+        } else {
+            const oldEventList = this.eventList;
+            const newEventList = [];
+
+            for (let i = 0, len = oldEventList.length; i < len; i++) {
+                const item = oldEventList[i];
+
+                if (item.name !== eventName) {
+                    newEventList.push(item);
+                }
+            }
+
+            this.eventList = newEventList;
+        }
     }
 
     async flush(type: flushTypes = 'waterfall') {
@@ -21,8 +41,8 @@ export class Events {
             case 'waterfall':
                 {
                     for (let i = 0, len = this.eventList.length; i < len; i++) {
-                        const callback = this.eventList[i];
-                        await callback();
+                        const { name, callback } = this.eventList[i];
+                        await callback(name);
                     }
                 }
                 break;
@@ -31,9 +51,9 @@ export class Events {
                 {
                     const promises = [];
                     for (let i = 0, len = this.eventList.length; i < len; i++) {
-                        const callback = this.eventList[i];
+                        const { name, callback } = this.eventList[i];
                         promises.push(new Promise((resolve, reject) => {
-                            resolve(callback());
+                            resolve(callback(name));
                         }));
                     }
 
