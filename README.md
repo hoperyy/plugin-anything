@@ -82,9 +82,9 @@ runPluginAnything(
         },
         async lifecycle({ hooks, Events, customs }) {
             // clear hook done
-            await hooks.done.clear();
+            // await hooks.done.clear();
 
-            // hook done won't run because it was cleared uppper
+            // hook done won't run if it was cleared uppper
             await hooks.done.flush('waterfall');
         }
     }
