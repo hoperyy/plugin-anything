@@ -6,9 +6,9 @@ class MyPlugin__A {
         console.log('my plugin A options', options);
     }
 
-    apply({ hooks, customs }) {
+    apply({ hooks, Events, customs }) {
         hooks.done.tap('my plugin A', async () => {
-            console.log('my plugin A');
+            console.log('my plugin A hook run');
         });
     }
 }
@@ -19,9 +19,9 @@ class MyPlugin__B {
         console.log('my plugin B options', options);
     }
 
-    apply({ hooks, customs }) {
+    apply({ hooks, Events, customs }) {
         hooks.done.tap('my plugin B', async () => {
-            console.log('my plugin B');
+            console.log('my plugin B hook run');
         });
     }
 }

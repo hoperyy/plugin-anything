@@ -56,7 +56,6 @@ class MyPlugin__A {
     }
 }
 
-
 class MyPlugin__B {
     constructor(options) {
         console.log('my plugin B options', options);
@@ -82,7 +81,10 @@ runPluginAnything(
             hooks.done = new Events();
         },
         async lifecycle({ hooks, Events, customs }) {
-            // flush hooks
+            // clear hook done
+            await hooks.done.clear();
+
+            // hook done won't run because it was cleared uppper
             await hooks.done.flush('waterfall');
         }
     }
