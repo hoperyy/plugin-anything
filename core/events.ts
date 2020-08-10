@@ -17,7 +17,7 @@ export class Events {
     }
 
     // clear eventList
-    clear(eventName?: string) {
+    untap(eventName?: string) {
         if (!eventName) {
             this.eventList = [];
         } else {

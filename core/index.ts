@@ -17,7 +17,7 @@ export class PluginAnything {
 
         (async () => {
             initOptions.onInit && (await initOptions.onInit(this.outerContext));
-            await this.flushPlugins();
+            await this.onFlushPlugins();
             initOptions.onLifecycle && (await initOptions.onLifecycle(this.outerContext));
         })();
     }
@@ -103,7 +103,7 @@ export class PluginAnything {
         return standardOutput;
     }
 
-    private async flushPlugins() {
+    private async onFlushPlugins() {
         const plugins: typePluginPresetArray = this.getPluginList();
 
         const promises = plugins.map(async ({ Fn, options }) => {
