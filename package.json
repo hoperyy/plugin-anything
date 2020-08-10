@@ -1,10 +1,11 @@
 {
   "name": "plugin-anything",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "",
   "main": "core/index.js",
   "scripts": {
-    "tsc:watch": "tsc -w"
+    "tsc:watch": "tsc -w",
+    "dev": "node demo/index"
   },
   "repository": {
     "type": "git",

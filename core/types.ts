@@ -1,12 +1,10 @@
+
 export interface typeInitOptions {
     searchList?: Array<string>;
     plugins?: Array<string | Array<any>>;
     presets?: Array<string | Array<any>>;
-}
-
-export interface typeInitCallbacks {
-    init(any): any;
-    lifecycle(any): any;
+    onInit?(any): any;
+    onLifecycle?(any): any;
 }
 
 export interface typeUserConfig {

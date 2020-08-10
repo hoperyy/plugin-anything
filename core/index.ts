@@ -3,16 +3,22 @@ import * as fs from 'fs';
 
 import { Events } from './events';
 import { toRawType, isArray, isString, isFunction } from './utils';
-import { typeInitOptions, typeStandardPluginPresetItem, typePluginPresetUserItem, typeOuterContext, typePluginPresetArray, typeInitCallbacks } from './types';
+import { typeInitOptions, typeStandardPluginPresetItem, typePluginPresetUserItem, typeOuterContext, typePluginPresetArray } from './types';
+
+const undefined = void 0;
 
 export class PluginAnything {
-    constructor(options: typeInitOptions = {}, callbackMap: typeInitCallbacks) {
-        this.options = { ...this.options, ...options };
+    constructor(initOptions: typeInitOptions) {
+        Object.assign(this.options, {
+            searchList: initOptions.searchList || [],
+            plugins: initOptions.plugins || [],
+            presets: initOptions.presets || [],
+        });
 
         (async () => {
-            await callbackMap.init(this.outerContext);
+            initOptions.onInit && (await initOptions.onInit(this.outerContext));
             await this.flushPlugins();
-            await callbackMap.lifecycle(this.outerContext);
+            initOptions.onLifecycle && (await initOptions.onLifecycle(this.outerContext));
         })();
     }
 
@@ -22,7 +28,7 @@ export class PluginAnything {
         customs: {},
     }
 
-    private readonly options: typeInitOptions = {
+    private readonly options = {
         searchList: [],
         plugins: [],
         presets: [],
@@ -50,28 +56,26 @@ export class PluginAnything {
         const type = toRawType(input)
 
         // use strategy pattern optimize code
-        const standardInputStrats = {
-            string: {
-                name: input as string,
+        const standardInputMap = {
+            'string': {
+                name: isString(input) ? input : undefined,
                 options: {}
             },
-            array: {
-                name: isArray(input) && input[0],
+            'array': {
+                name: isArray(input) ? input[0] : undefined,
                 options: input[1] || {}
             },
-            function: {
-                name: input as Function,
+            'function': {
+                name: isFunction(input) ? input : undefined,
                 options: {}
             }
         }
 
-        let standardInput = standardInputStrats[type] || null;
+        let standardInput = standardInputMap[type] || null;
 
         if (!standardInput) {
             return null;
         }
-
-        // const prefix = `plugined-rollup-scaffold-${tag}-`;
 
         if (isFunction(standardInput.name)) {
             standardOutput = {
@@ -111,6 +115,6 @@ export class PluginAnything {
     }
 }
 
-export function runPluginAnything(initOptions, callbacks) {
-    return new PluginAnything(initOptions, callbacks);
+export function runPluginAnything(initOptions) {
+    return new PluginAnything(initOptions);
 }
