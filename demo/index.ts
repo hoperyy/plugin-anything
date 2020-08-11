@@ -25,8 +25,8 @@ class MyPlugin__A {
         console.log('my plugin A options', options);
     }
 
-    apply(compiler: FinalCompilerType) {
-        const { hooks, utils, Hooks } = compiler;
+    apply(finalCompiler: FinalCompilerType) {
+        const { hooks, utils, Hooks } = finalCompiler;
 
         hooks.start.tap('my plugin A', async () => {
             console.log('my plugin A hook run');
@@ -39,8 +39,8 @@ class MyPlugin__B {
         console.log('my plugin B options', options);
     }
 
-    apply(compiler: FinalCompilerType) {
-        const { hooks, utils, Hooks } = compiler;
+    apply(finalCompiler: FinalCompilerType) {
+        const { hooks, utils, Hooks } = finalCompiler;
 
         hooks.done.tap('my plugin B', async () => {
             console.log('my plugin B hook run');
@@ -64,8 +64,8 @@ runPluginAnything(
         searchList: [],
 
         // init hooks and customs
-        async onInit(compiler: BaseCompilerType) {
-            const { hooks, Hooks } = compiler;
+        async onInit(baseCompiler: BaseCompilerType) {
+            const { hooks, Hooks } = baseCompiler;
 
             Object.assign(hooks, {
                 start: new Hooks(),
@@ -73,7 +73,7 @@ runPluginAnything(
             });
 
             // add utils in compiler for lifecycle and plugins using
-            Object.assign(compiler, {
+            Object.assign(baseCompiler, {
                 utils: {
                     aaa: 1
                 }
@@ -81,9 +81,9 @@ runPluginAnything(
         },
 
         // init lifecycle
-        async onLifecycle(compiler: FinalCompilerType) {
+        async onLifecycle(finalCompiler: FinalCompilerType) {
             // compiler.utils was added in `onInit` callback.
-            const { hooks, utils, Hooks } = compiler;
+            const { hooks, utils, Hooks } = finalCompiler;
 
             await hooks.start.flush();
 
