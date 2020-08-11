@@ -161,7 +161,7 @@ my plugin A hook run
 
         When `name` is blank, clear callback list.
 
-    +   `.flush(type?: sync | waterfall | bail)`
+    +   `.flush(type?: sync | waterfall | paralle)`
 
         Run all callbacks.
 
