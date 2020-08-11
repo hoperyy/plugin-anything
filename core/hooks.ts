@@ -10,6 +10,14 @@ export class Hooks {
     eventList: eventListType = [];
 
     tap(name: string, callback: Function): any {
+        if (typeof name !== 'string') {
+            throw Error('\n\n[plugin-anything] "name" should be a string in tap(name: string, callback: Function)\n\n');
+        }
+
+        if (typeof callback !== 'function') {
+            throw Error('\n\n[plugin-anything] "callback" should be a function in tap(name: string, callback: Function)\n\n');
+        }
+
         this.eventList.push({
             name,
             callback
@@ -43,6 +51,7 @@ export class Hooks {
                 {
                     for (let i = 0, len = this.eventList.length; i < len; i++) {
                         const { callback } = this.eventList[i];
+                        console.log(callback);
                         await callback(null);
                     }
                 }
