@@ -51,7 +51,6 @@ export class Hooks {
                 {
                     for (let i = 0, len = this.eventList.length; i < len; i++) {
                         const { callback } = this.eventList[i];
-                        console.log(callback);
                         await callback(null);
                     }
                 }
