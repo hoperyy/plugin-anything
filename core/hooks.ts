@@ -1,4 +1,4 @@
-type flushTypes = 'waterfall' | 'bail';
+type flushTypes = 'sync' | 'waterfall' | 'paralle';
 
 type eventListType = Array< { name: string, callback: Function } >;
 
@@ -36,18 +36,31 @@ export class Hooks {
         }
     }
 
-    async flush(type: flushTypes = 'waterfall') {
+    async flush(type: flushTypes = 'sync') {
         switch (type) {
-            case 'waterfall':
+            // sync running
+            case 'sync':
                 {
                     for (let i = 0, len = this.eventList.length; i < len; i++) {
                         const { name, callback } = this.eventList[i];
-                        await callback(name);
+                        await callback(name, null);
                     }
                 }
                 break;
 
-            case 'bail':
+            // sync running && next hook will receive previous hook returns.
+            case 'waterfall':
+                {
+                    let preRt = null;
+                    for (let i = 0, len = this.eventList.length; i < len; i++) {
+                        const { name, callback } = this.eventList[i];
+                        const curRt = await callback(name, preRt);
+                        preRt = curRt;
+                    }
+                }
+            
+            // paralle running
+            case 'paralle':
                 {
                     const promises = [];
                     for (let i = 0, len = this.eventList.length; i < len; i++) {
