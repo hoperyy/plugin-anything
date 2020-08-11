@@ -3,7 +3,7 @@ import * as fs from 'fs';
 
 import { Hooks } from './hooks';
 import { toRawType, isArray, isString, isFunction } from './utils';
-import { typeInitOptions, typeStandardPluginPresetItem, typePluginPresetUserItem, typeOuterContext, typePluginPresetArray } from './types';
+import { typeInitOptions, typeStandardPluginPresetItem, typePluginPresetUserItem, typeBaseCompilerForUser, typePluginPresetArray } from './types';
 
 const undefined = void 0;
 
@@ -22,7 +22,7 @@ export class PluginAnything {
         })();
     }
 
-    private outerContext: typeOuterContext = {
+    private outerContext: typeBaseCompilerForUser = {
         hooks: {},
         Hooks,
     }
