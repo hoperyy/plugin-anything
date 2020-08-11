@@ -32,7 +32,7 @@ class MyPlugin__A {
     apply(finalCompiler: FinalCompilerType) {
         const { hooks, utils, Hooks } = finalCompiler;
 
-        hooks.start.tap('my plugin A', async () => {
+        hooks.start.tap('my plugin A', async (data) => {
             console.log('my plugin A hook run');
         });
     }
@@ -46,7 +46,7 @@ class MyPlugin__B {
     apply(finalCompiler: FinalCompilerType) {
         const { hooks, utils, Hooks } = finalCompiler;
 
-        hooks.done.tap('my plugin B', async () => {
+        hooks.done.tap('my plugin B', async (data) => {
             console.log('my plugin B hook run');
         });
     }

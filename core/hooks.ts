@@ -42,8 +42,8 @@ export class Hooks {
             case 'sync':
                 {
                     for (let i = 0, len = this.eventList.length; i < len; i++) {
-                        const { name, callback } = this.eventList[i];
-                        await callback(name, null);
+                        const { callback } = this.eventList[i];
+                        await callback(null);
                     }
                 }
                 break;
@@ -53,20 +53,21 @@ export class Hooks {
                 {
                     let preRt = null;
                     for (let i = 0, len = this.eventList.length; i < len; i++) {
-                        const { name, callback } = this.eventList[i];
-                        const curRt = await callback(name, preRt);
+                        const { callback } = this.eventList[i];
+                        const curRt = await callback(preRt);
                         preRt = curRt;
                     }
                 }
+                break;
             
             // paralle running
             case 'paralle':
                 {
                     const promises = [];
                     for (let i = 0, len = this.eventList.length; i < len; i++) {
-                        const { name, callback } = this.eventList[i];
+                        const { callback } = this.eventList[i];
                         promises.push(new Promise((resolve, reject) => {
-                            resolve(callback(name));
+                            resolve(callback(null));
                         }));
                     }
 

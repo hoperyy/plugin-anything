@@ -28,8 +28,10 @@ class MyPlugin__A {
     apply(finalCompiler: FinalCompilerType) {
         const { hooks, utils, Hooks } = finalCompiler;
 
-        hooks.start.tap('my plugin A', async () => {
-            console.log('my plugin A hook run');
+        hooks.done.tap('my plugin A', async (data) => {
+            console.log('my plugin A hook run', data);
+
+            return 'a';
         });
     }
 }
@@ -42,8 +44,8 @@ class MyPlugin__B {
     apply(finalCompiler: FinalCompilerType) {
         const { hooks, utils, Hooks } = finalCompiler;
 
-        hooks.done.tap('my plugin B', async () => {
-            console.log('my plugin B hook run');
+        hooks.done.tap('my plugin B', async (data) => {
+            console.log('my plugin B hook run', data);
         });
     }
 }
@@ -85,10 +87,10 @@ runPluginAnything(
             // compiler.utils was added in `onInit` callback.
             const { hooks, utils, Hooks } = finalCompiler;
 
-            await hooks.start.flush();
+            // await hooks.start.flush();
 
             // hook done won't run if it was untapped
-            await hooks.done.flush();
+            await hooks.done.flush('waterfall');
         }
     }
 );
