@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-import { Events } from './events';
+import { Hooks } from './hooks';
 import { toRawType, isArray, isString, isFunction } from './utils';
 import { typeInitOptions, typeStandardPluginPresetItem, typePluginPresetUserItem, typeOuterContext, typePluginPresetArray } from './types';
 
@@ -24,8 +24,7 @@ export class PluginAnything {
 
     private outerContext: typeOuterContext = {
         hooks: {},
-        Events,
-        customs: {},
+        Hooks,
     }
 
     private readonly options = {

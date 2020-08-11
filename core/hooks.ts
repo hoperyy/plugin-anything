@@ -2,7 +2,7 @@ type flushTypes = 'waterfall' | 'bail';
 
 type eventListType = Array< { name: string, callback: Function } >;
 
-export class Events {
+export class Hooks {
     constructor() {
 
     }
