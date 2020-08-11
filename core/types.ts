@@ -56,10 +56,9 @@ export interface typeRollupConfig {
     strict?: any
 }
 
-export interface typeOuterContext {
+export interface typeBaseCompilerForUser {
     hooks: object;
-    Events: Function,
-    customs: object,
+    Hooks: Function,
 }
 
 export interface typeStandardPluginPresetItem {

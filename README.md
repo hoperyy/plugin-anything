@@ -2,59 +2,110 @@
 
 Make pluginable applications.
 
-# APIs
+# Demo
 
 ```js
-const { runPluginAnything } = require('plugin-anything');
+interface BaseCompilerType {
+    readonly Hooks: FunctionConstructor;
+    hooks: {
+        [name: string]: {
+            tap: Function;
+            untap: Function;
+            flush: Function;
+        }
+    };
+    // ... for customs
+    [ name: string ]: any
+}
+
+interface FinalCompilerType extends BaseCompilerType {
+    utils: {
+        [ name: string ]: any
+    }
+}
+
+class MyPlugin__A {
+    constructor(options) {
+        console.log('my plugin A options', options);
+    }
+
+    apply(finalCompiler: FinalCompilerType) {
+        const { hooks, utils, Hooks } = finalCompiler;
+
+        hooks.start.tap('my plugin A', async () => {
+            console.log('my plugin A hook run');
+        });
+    }
+}
+
+class MyPlugin__B {
+    constructor(options) {
+        console.log('my plugin B options', options);
+    }
+
+    apply(finalCompiler: FinalCompilerType) {
+        const { hooks, utils, Hooks } = finalCompiler;
+
+        hooks.done.tap('my plugin B', async () => {
+            console.log('my plugin B hook run');
+        });
+    }
+}
 
 runPluginAnything(
     {
-        /** options **/
+
+        // Array< string | FunctionContructor | Array<string | FunctionContructor, object> >
+        plugins: [
+            MyPlugin__A,
+
+            [MyPlugin__B, { name: 'bbb' }]
+        ],
 
         // Array< string >
         // search plugins when plugin name is string
         // Array item should be absolute folder path
-        searchList: [
-            // string: absolute folder path
-        ],
+        searchList: [],
 
-        // Array< string | FunctionContructor | Array<string | FunctionContructor, object> >
-        plugins: [
-            // string: plugin name
-            // FunctionContructor: Plugin Constructor
-            // Array: [ string | FunctionContructor, options object ]
-        ],
+        // init hooks and customs
+        async onInit(baseCompiler: BaseCompilerType) {
+            const { hooks, Hooks } = baseCompiler;
 
-
-        /** callbacks **/
-
-        // init something like: hooks, customs config
-        async onInit({ hooks, Events, customs }) {
             Object.assign(hooks, {
-                start: new Events(),
-                done: new Events(),
+                start: new Hooks(),
+                done: new Hooks()
             });
 
-            // init customs params
-            Object.assign(customs, {
-                test: 1
+            // add utils in compiler for lifecycle and plugins using
+            Object.assign(baseCompiler, {
+                utils: {
+                    aaa: 1
+                }
             });
         },
 
         // init lifecycle
-        async onLifecycle({ hooks, Events, customs }) {
-            // flush hooks
+        async onLifecycle(finalCompiler: FinalCompilerType) {
+            // compiler.utils was added in `onInit` callback.
+            const { hooks, utils, Hooks } = finalCompiler;
+
             await hooks.start.flush();
 
-            // do something
-            // ...
-            // console.log(customs.myConfig);
-
+            // hook done won't run if it was untapped
             await hooks.done.flush();
         }
     }
 );
 ```
+
+```bash
+my plugin A options {}
+my plugin B options { name: 'bbb' }
+my plugin B hook run
+my plugin A hook run
+```
+
+## APIs
 
 +   `searchList`: Array< string >
 
@@ -70,7 +121,7 @@ runPluginAnything(
 
         options: {};
 
-        apply({ hooks, Events, customs }) {
+        apply(compiler) {
 
         }
     }
@@ -90,10 +141,10 @@ runPluginAnything(
     }
     ```
 
-+   `Events`
++   `Hooks`
 
     ```ts
-    const hookA = new Events();
+    const hookA = new Hooks();
     ```
 
     +   `.tap(name: string, callback: Function)`
@@ -113,77 +164,6 @@ runPluginAnything(
     +   `.flush(type?: waterfall | bail)`
 
         Run all callbacks.
-
-# Demo
-
-```js
-const { runPluginAnything } = require('plugin-anything');
-
-class MyPlugin__A {
-    constructor(options) {
-        console.log('my plugin A options', options);
-    }
-
-    apply({ hooks, Events, customs }) {
-        hooks.start.tap('my plugin A', async () => {
-            console.log('my plugin A hook run');
-        });
-    }
-}
-
-class MyPlugin__B {
-    constructor(options) {
-        console.log('my plugin B options', options);
-    }
-
-    apply({ hooks, Events, customs }) {
-        hooks.done.tap('my plugin B', async () => {
-            console.log('my plugin B hook run');
-        });
-    }
-}
-
-runPluginAnything(
-    {
-        plugins: [
-            MyPlugin__A,
-
-            [ MyPlugin__B, { name: 'bbb' } ]
-        ],
-
-        // init hooks and customs
-        async onInit({ hooks, Events, customs }) {
-            Object.assign(hooks, {
-                start: new Events(),
-                done: new Events(),
-            });
-
-            // init customs params
-            Object.assign(customs, {
-                test: 1
-            });
-        },
-
-        // init lifecycle
-        async onLifecycle({ hooks, Events, customs }) {
-            await hooks.start.flush();
-
-            // untap: hook done
-            // await hooks.done.untap();
-
-            // hook done won't run if it was untapped
-            await hooks.done.flush();
-        }
-    }
-);
-```
-
-```bash
-my plugin A options {}
-my plugin B options { name: 'bbb' }
-my plugin B hook run
-my plugin A hook run
-```
 
 # LICENSE
 
