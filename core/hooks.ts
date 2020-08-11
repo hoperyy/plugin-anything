@@ -1,4 +1,4 @@
-type flushTypes = 'waterfall' | 'bail';
+type flushTypes = 'sync' | 'waterfall' | 'paralle';
 
 type eventListType = Array< { name: string, callback: Function } >;
 
@@ -10,6 +10,14 @@ export class Hooks {
     eventList: eventListType = [];
 
     tap(name: string, callback: Function): any {
+        if (typeof name !== 'string') {
+            throw Error('\n\n[plugin-anything] "name" should be a string in tap(name: string, callback: Function)\n\n');
+        }
+
+        if (typeof callback !== 'function') {
+            throw Error('\n\n[plugin-anything] "callback" should be a function in tap(name: string, callback: Function)\n\n');
+        }
+
         this.eventList.push({
             name,
             callback
@@ -36,24 +44,38 @@ export class Hooks {
         }
     }
 
-    async flush(type: flushTypes = 'waterfall') {
+    async flush(type: flushTypes = 'sync') {
         switch (type) {
-            case 'waterfall':
+            // sync running
+            case 'sync':
                 {
                     for (let i = 0, len = this.eventList.length; i < len; i++) {
-                        const { name, callback } = this.eventList[i];
-                        await callback(name);
+                        const { callback } = this.eventList[i];
+                        await callback(null);
                     }
                 }
                 break;
 
-            case 'bail':
+            // sync running && next hook will receive previous hook returns.
+            case 'waterfall':
+                {
+                    let preRt = null;
+                    for (let i = 0, len = this.eventList.length; i < len; i++) {
+                        const { callback } = this.eventList[i];
+                        const curRt = await callback(preRt);
+                        preRt = curRt;
+                    }
+                }
+                break;
+            
+            // paralle running
+            case 'paralle':
                 {
                     const promises = [];
                     for (let i = 0, len = this.eventList.length; i < len; i++) {
-                        const { name, callback } = this.eventList[i];
+                        const { callback } = this.eventList[i];
                         promises.push(new Promise((resolve, reject) => {
-                            resolve(callback(name));
+                            resolve(callback(null));
                         }));
                     }
 
