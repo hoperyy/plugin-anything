@@ -5,6 +5,8 @@ Make pluginable applications.
 # Demo
 
 ```js
+const { runPluginAnything } = require('plugin-anything');
+
 interface BaseCompilerType {
     readonly Hooks: FunctionConstructor;
     hooks: {
@@ -32,8 +34,10 @@ class MyPlugin__A {
     apply(finalCompiler: FinalCompilerType) {
         const { hooks, utils, Hooks } = finalCompiler;
 
-        hooks.start.tap('my plugin A', async (data) => {
-            console.log('my plugin A hook run');
+        hooks.done.tap('my plugin A', async (data) => {
+            console.log('my plugin A hook run', data);
+
+            return 'a';
         });
     }
 }
@@ -47,7 +51,7 @@ class MyPlugin__B {
         const { hooks, utils, Hooks } = finalCompiler;
 
         hooks.done.tap('my plugin B', async (data) => {
-            console.log('my plugin B hook run');
+            console.log('my plugin B hook run', data);
         });
     }
 }
@@ -67,10 +71,10 @@ runPluginAnything(
         // Array item should be absolute folder path
         searchList: [],
 
-        // init hooks and customs
         async onInit(baseCompiler: BaseCompilerType) {
             const { hooks, Hooks } = baseCompiler;
 
+            // init hooks
             Object.assign(hooks, {
                 start: new Hooks(),
                 done: new Hooks()
@@ -89,10 +93,10 @@ runPluginAnything(
             // compiler.utils was added in `onInit` callback.
             const { hooks, utils, Hooks } = finalCompiler;
 
-            await hooks.start.flush();
+            // await hooks.start.flush();
 
             // hook done won't run if it was untapped
-            await hooks.done.flush();
+            await hooks.done.flush('waterfall');
         }
     }
 );

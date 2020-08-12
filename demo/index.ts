@@ -65,10 +65,10 @@ runPluginAnything(
         // Array item should be absolute folder path
         searchList: [],
 
-        // init hooks and customs
         async onInit(baseCompiler: BaseCompilerType) {
             const { hooks, Hooks } = baseCompiler;
 
+            // init hooks
             Object.assign(hooks, {
                 start: new Hooks(),
                 done: new Hooks()
