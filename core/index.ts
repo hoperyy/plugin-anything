@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import { Hooks } from './hooks';
-import { toRawType, isArray, isString, isFunction } from './utils';
+import { toRawType, isArray, isString, isFunction, isPlainObject } from './utils';
 import { typeInitOptions, typeStandardPluginPresetItem, typePluginPresetUserItem, typeBaseCompilerForUser, typePluginPresetArray } from './types';
 
 const undefined = void 0;
@@ -66,6 +66,10 @@ export class PluginAnything {
             },
             'function': {
                 name: isFunction(input) ? input : undefined,
+                options: {}
+            },
+            'object': {
+                name: isPlainObject(input) ? (input as { name: string }).name : undefined,
                 options: {}
             }
         }
