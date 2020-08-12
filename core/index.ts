@@ -52,7 +52,7 @@ export class PluginAnything {
     private findModule(input: typePluginPresetUserItem, tag: 'plugin' | 'preset'): typeStandardPluginPresetItem {
         let standardOutput = null;
 
-        const type = toRawType(input)
+        const type = toRawType(input);
 
         // use strategy pattern optimize code
         const standardInputMap = {

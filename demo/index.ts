@@ -1,6 +1,5 @@
 
 import { runPluginAnything } from '../core/index';
-import { typeInitOptions } from '../core/types';
 
 interface BaseCompilerType {
     readonly Hooks: FunctionConstructor;
