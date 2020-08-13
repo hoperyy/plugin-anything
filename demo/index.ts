@@ -11,12 +11,12 @@ interface BaseCompilerType {
         }
     };
     // ... for customs
-    [ name: string ]: any
+    [name: string]: any
 }
 
 interface FinalCompilerType extends BaseCompilerType {
     utils: {
-        [ name: string ]: any
+        [name: string]: any
     }
 }
 
@@ -50,6 +50,22 @@ class MyPlugin__B {
     }
 }
 
+class MyPlugin__C {
+    constructor(options) {
+        console.log('my plugin C options', options);
+    }
+
+    name: string
+
+    apply(finalCompiler: FinalCompilerType) {
+        const { hooks, utils, Hooks } = finalCompiler;
+
+        hooks.done.tap('my plugin C', async (data) => {
+            console.log('my plugin C hook run', data);
+        });
+    }
+}
+
 runPluginAnything(
     {
 
@@ -57,7 +73,9 @@ runPluginAnything(
         plugins: [
             MyPlugin__A,
 
-            [MyPlugin__B, { name: 'bbb' }]
+            [MyPlugin__B, { name: 'bbb' }],
+
+            new MyPlugin__C({ name: 'ccc' })
         ],
 
         // Array< string >
