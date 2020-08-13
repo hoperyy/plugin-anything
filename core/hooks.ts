@@ -1,6 +1,8 @@
 type flushTypes = 'sync' | 'waterfall' | 'paralle';
 
-type eventListType = Array< { name: string, callback: Function } >;
+type eventListType = Array<{ name: string, callback: Function | Promise<any> } >;
+
+import { isPromise } from './utils';
 
 export class Hooks {
     constructor() {
@@ -9,14 +11,14 @@ export class Hooks {
 
     eventList: eventListType = [];
 
-    tap(name: string, callback: Function): any {
+    tap(name: string, callback: Function | Promise<any>): any {
         if (typeof name !== 'string') {
             throw Error('\n\n[plugin-anything] "name" should be a string in tap(name: string, callback: Function)\n\n');
         }
 
-        if (typeof callback !== 'function') {
-            throw Error('\n\n[plugin-anything] "callback" should be a function in tap(name: string, callback: Function)\n\n');
-        }
+        // if (typeof callback !== 'function') {
+        //     throw Error('\n\n[plugin-anything] "callback" should be a function in tap(name: string, callback: Function)\n\n');
+        // }
 
         this.eventList.push({
             name,
@@ -51,7 +53,12 @@ export class Hooks {
                 {
                     for (let i = 0, len = this.eventList.length; i < len; i++) {
                         const { callback } = this.eventList[i];
-                        await callback(null);
+
+                        if (isPromise(callback)) {
+                            await callback as Promise<any>;
+                        } else {
+                            await (callback as Function)(null);
+                        }
                     }
                 }
                 break;
@@ -62,7 +69,15 @@ export class Hooks {
                     let preRt = null;
                     for (let i = 0, len = this.eventList.length; i < len; i++) {
                         const { callback } = this.eventList[i];
-                        const curRt = await callback(preRt);
+
+                        let curRt = null;
+
+                        if (isPromise(callback)) {
+                            curRt = await callback as Promise<any>;
+                        } else {
+                            curRt = await (callback as Function)(preRt);
+                        }
+
                         preRt = curRt;
                     }
                 }
@@ -75,7 +90,11 @@ export class Hooks {
                     for (let i = 0, len = this.eventList.length; i < len; i++) {
                         const { callback } = this.eventList[i];
                         promises.push(new Promise((resolve, reject) => {
-                            resolve(callback(null));
+                            if (isPromise(callback)) {
+                                resolve(callback);
+                            } else {
+                                resolve((callback as Function)(null));
+                            }
                         }));
                     }
 

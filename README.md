@@ -169,12 +169,12 @@ my plugin A hook run
     const hookA = new Hooks();
     ```
 
-    +   `.tap(name: string, callback: Function)`
+    +   `.tap(name: string, callback: Function | Promise<any>)`
 
         Add callback at current hook event.
 
         ```ts
-        hookA.tap(name: string, callback: Function);
+        hookA.tap(name: string, callback: Function | Promise<any>);
         ```
 
     +   `.untap(name?: string)`

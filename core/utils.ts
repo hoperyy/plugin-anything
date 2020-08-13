@@ -46,11 +46,20 @@ function isPlainObject(value): boolean {
     return toRawType(value) === 'object';
 }
 
+/**
+ * @param {Any} value
+ * @returns {Boolean}
+ */
+function isPromise(value): boolean {
+    return toRawType(value) === 'promise';
+}
+
 export {
     toRawType,
     isArray,
     isString,
     isFunction,
     isObject,
-    isPlainObject
+    isPlainObject,
+    isPromise,
 }
