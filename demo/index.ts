@@ -11,12 +11,12 @@ interface BaseCompilerType {
         }
     };
     // ... for customs
-    [ name: string ]: any
+    [name: string]: any
 }
 
 interface FinalCompilerType extends BaseCompilerType {
     utils: {
-        [ name: string ]: any
+        [name: string]: any
     }
 }
 
@@ -52,8 +52,6 @@ class MyPlugin__B {
 
 class MyPlugin__C {
     constructor(options) {
-        const { name } = options
-        this.name = name
         console.log('my plugin C options', options);
     }
 

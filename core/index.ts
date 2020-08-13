@@ -1,11 +1,11 @@
+const undefined = void 0;
+
 import * as path from 'path';
 import * as fs from 'fs';
 
 import { Hooks } from './hooks';
 import { toRawType, isArray, isString, isFunction, isPlainObject } from './utils';
 import { typeInitOptions, typeStandardPluginPresetItem, typePluginPresetUserItem, typeBaseCompilerForUser, typePluginPresetArray } from './types';
-
-const undefined = void 0;
 
 export class PluginAnything {
     constructor(initOptions: typeInitOptions) {
@@ -38,7 +38,6 @@ export class PluginAnything {
 
         // search plugin/presets entries
         const standardPluginList: typePluginPresetArray = pluginNameList.map(name => this.findModule(name, 'plugin')).filter(item => !!item);
-
         const pluginConstructors = standardPluginList.map(({ Fn, options }) => {
             return {
                 Fn,
@@ -69,7 +68,7 @@ export class PluginAnything {
                 options: {}
             },
             'object': {
-                name: isPlainObject(input) ? (input as { name: string }).name : undefined,
+                name: isPlainObject(input) ? input : undefined,
                 options: {}
             }
         }
@@ -80,7 +79,7 @@ export class PluginAnything {
             return null;
         }
 
-        if (isFunction(standardInput.name)) {
+        if (isFunction(standardInput.name) || isPlainObject(standardInput.name)) {
             standardOutput = {
                 Fn: standardInput.name,
                 options: standardInput.options,
@@ -110,7 +109,7 @@ export class PluginAnything {
         const plugins: typePluginPresetArray = this.getPluginList();
 
         const promises = plugins.map(async ({ Fn, options }) => {
-            const plugin = new Fn(options);
+            const plugin = isFunction(Fn) ? new Fn(options) : Fn;
             plugin.apply && await plugin.apply(this.outerContext);
         });
 
