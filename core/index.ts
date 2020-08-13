@@ -92,8 +92,9 @@ export class PluginAnything {
                 const modulePath: string = path.join(curSearchPath, moduleName, 'index.js');
 
                 if (fs.existsSync(modulePath)) {
+                    const obj = require(modulePath);
                     standardOutput = {
-                        value: require(modulePath).default,
+                        value: obj.default || obj,
                         options: standardInput.options,
                     }
 
