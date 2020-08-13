@@ -3,7 +3,7 @@
  * @returns {string}
  */
 function toRawType(value): string {
-  return Object.prototype.toString.call(value).slice(8, -1).toLowerCase();
+    return Object.prototype.toString.call(value).slice(8, -1).toLowerCase();
 }
 
 /**
@@ -11,7 +11,7 @@ function toRawType(value): string {
  * @returns {Boolean}
  */
 function isArray(value): boolean {
-  return toRawType(value) === 'array';
+    return toRawType(value) === 'array';
 }
 
 /**
@@ -19,7 +19,7 @@ function isArray(value): boolean {
  * @returns {Boolean}
  */
 function isString(value): boolean {
-  return toRawType(value) === 'string';
+    return toRawType(value) === 'string';
 }
 
 /**
@@ -27,7 +27,7 @@ function isString(value): boolean {
  * @returns {Boolean}
  */
 function isFunction(value): boolean {
-  return toRawType(value) === 'function';
+    return toRawType(value) === 'function';
 }
 
 /**
@@ -35,7 +35,7 @@ function isFunction(value): boolean {
  * @returns {Boolean}
  */
 function isObject(value): boolean {
-  return value && typeof value === 'object';
+    return value && typeof value === 'object';
 }
 
 /**
@@ -43,14 +43,14 @@ function isObject(value): boolean {
  * @returns {Boolean}
  */
 function isPlainObject(value): boolean {
-  return toRawType(value) === 'object';
+    return toRawType(value) === 'object';
 }
 
 export {
-  toRawType,
-  isArray,
-  isString,
-  isFunction,
-  isObject,
-  isPlainObject
+    toRawType,
+    isArray,
+    isString,
+    isFunction,
+    isObject,
+    isPlainObject
 }
