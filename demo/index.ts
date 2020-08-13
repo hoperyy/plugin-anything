@@ -1,7 +1,7 @@
 
 import { runPluginAnything } from '../core/index';
 
-interface BaseCompilerType {
+interface BaseContextType {
     readonly Hooks: FunctionConstructor;
     hooks: {
         [name: string]: {
@@ -14,7 +14,7 @@ interface BaseCompilerType {
     [name: string]: any
 }
 
-interface FinalCompilerType extends BaseCompilerType {
+interface FinalContextType extends BaseContextType {
     utils: {
         [name: string]: any
     }
@@ -25,8 +25,8 @@ class MyPlugin__A {
         console.log('my plugin A options', options);
     }
 
-    apply(finalCompiler: FinalCompilerType) {
-        const { hooks, utils, Hooks } = finalCompiler;
+    apply(finalContext: FinalContextType) {
+        const { hooks, utils, Hooks } = finalContext;
 
         hooks.done.tap('my plugin A', async (data) => {
             console.log('my plugin A hook run', data);
@@ -41,8 +41,8 @@ class MyPlugin__B {
         console.log('my plugin B options', options);
     }
 
-    apply(finalCompiler: FinalCompilerType) {
-        const { hooks, utils, Hooks } = finalCompiler;
+    apply(finalContext: FinalContextType) {
+        const { hooks, utils, Hooks } = finalContext;
 
         hooks.done.tap('my plugin B', async (data) => {
             console.log('my plugin B hook run', data);
@@ -57,8 +57,8 @@ class MyPlugin__C {
 
     name: string
 
-    apply(finalCompiler: FinalCompilerType) {
-        const { hooks, utils, Hooks } = finalCompiler;
+    apply(finalContext: FinalContextType) {
+        const { hooks, utils, Hooks } = finalContext;
 
         hooks.done.tap('my plugin C', async (data) => {
             console.log('my plugin C hook run', data);
@@ -83,8 +83,8 @@ runPluginAnything(
         // Array item should be absolute folder path
         searchList: [],
 
-        async onInit(baseCompiler: BaseCompilerType) {
-            const { hooks, Hooks } = baseCompiler;
+        async onInit(baseContext: BaseContextType) {
+            const { hooks, Hooks } = baseContext;
 
             // init hooks
             Object.assign(hooks, {
@@ -93,7 +93,7 @@ runPluginAnything(
             });
 
             // add utils in compiler for lifecycle and plugins using
-            Object.assign(baseCompiler, {
+            Object.assign(baseContext, {
                 utils: {
                     aaa: 1
                 }
@@ -101,9 +101,9 @@ runPluginAnything(
         },
 
         // init lifecycle
-        async onLifecycle(finalCompiler: FinalCompilerType) {
+        async onLifecycle(finalContext: FinalContextType) {
             // compiler.utils was added in `onInit` callback.
-            const { hooks, utils, Hooks } = finalCompiler;
+            const { hooks, utils, Hooks } = finalContext;
 
             // await hooks.start.flush();
 
