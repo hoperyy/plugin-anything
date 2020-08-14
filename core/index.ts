@@ -37,10 +37,10 @@ export class PluginAnything {
         const { plugins: pluginNameList, presets: presetNameList } = this.options;
 
         // search plugin/presets entries
-        const standardPluginList: typePluginPresetArray = pluginNameList.map(name => this.findModule(name, 'plugin')).filter(item => !!item);
-        const pluginConstructors = standardPluginList.map(({ Fn, options }) => {
+        const standardPluginList: typePluginPresetArray = pluginNameList.map(input => this.findModule(input, 'plugin')).filter(item => !!item);
+        const pluginConstructors = standardPluginList.map(({ value, options }) => {
             return {
-                Fn,
+                value,
                 options,
             };
         });
@@ -56,19 +56,19 @@ export class PluginAnything {
         // use strategy pattern optimize code
         const standardInputMap = {
             'string': {
-                name: isString(input) ? input : undefined,
+                value: isString(input) ? input : undefined,
                 options: {}
             },
             'array': {
-                name: isArray(input) ? input[0] : undefined,
+                value: isArray(input) ? input[0] : undefined,
                 options: input[1] || {}
             },
             'function': {
-                name: isFunction(input) ? input : undefined,
+                value: isFunction(input) ? input : undefined,
                 options: {}
             },
             'object': {
-                name: isPlainObject(input) ? input : undefined,
+                value: isPlainObject(input) && isFunction((input as { apply: Function }).apply) ? input : undefined,
                 options: {}
             }
         }
@@ -79,21 +79,22 @@ export class PluginAnything {
             return null;
         }
 
-        if (isFunction(standardInput.name) || isPlainObject(standardInput.name)) {
+        if (isFunction(standardInput.value) || isPlainObject(standardInput.value)) {
             standardOutput = {
-                Fn: standardInput.name,
+                value: standardInput.value,
                 options: standardInput.options,
             }
-        } else if (isString(standardInput.name)) {
+        } else if (isString(standardInput.value)) {
             for (let i = 0, len = this.options.searchList.length; i < len; i++) {
                 const curSearchPath: string = this.options.searchList[i];
-                const moduleName: string = standardInput.name; // standardInput.name.indexOf(prefix) === -1 ? `${prefix}${standardInput.name}` : standardInput.name;
+                const moduleName: string = standardInput.value; // standardInput.value.indexOf(prefix) === -1 ? `${prefix}${standardInput.value}` : standardInput.value;
                 // get absolute path
                 const modulePath: string = path.join(curSearchPath, moduleName, 'index.js');
 
                 if (fs.existsSync(modulePath)) {
+                    const obj = require(modulePath);
                     standardOutput = {
-                        Fn: require(modulePath).default,
+                        value: obj.default || obj,
                         options: standardInput.options,
                     }
 
@@ -108,9 +109,17 @@ export class PluginAnything {
     private async onFlushPlugins() {
         const plugins: typePluginPresetArray = this.getPluginList();
 
-        const promises = plugins.map(async ({ Fn, options }) => {
-            const plugin = isFunction(Fn) ? new Fn(options) : Fn;
-            plugin.apply && await plugin.apply(this.outerContext);
+        const promises = plugins.map(async ({ value, options }) => {
+            let pluginObject;
+
+            if (isFunction(value)) {
+                const Fn: FunctionConstructor = value as FunctionConstructor;
+                pluginObject = new Fn(options);
+            } else {
+                pluginObject = value;
+            }
+
+            pluginObject.apply && await pluginObject.apply(this.outerContext);
         });
 
         await Promise.all(promises);

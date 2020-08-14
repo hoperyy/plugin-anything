@@ -62,6 +62,6 @@ export interface typeBaseCompilerForUser {
 }
 
 export interface typeStandardPluginPresetItem {
-    Fn(options: object): void;
-    options: object;
+    value: FunctionConstructor | { apply: (data?: any) => any, [name: string]: any };
+    options: any;
 }

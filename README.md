@@ -7,7 +7,7 @@ Make pluginable applications.
 ```js
 const { runPluginAnything } = require('plugin-anything');
 
-interface BaseCompilerType {
+interface BaseContextType {
     readonly Hooks: FunctionConstructor;
     hooks: {
         [name: string]: {
@@ -17,12 +17,12 @@ interface BaseCompilerType {
         }
     };
     // ... for customs
-    [ name: string ]: any
+    [name: string]: any
 }
 
-interface FinalCompilerType extends BaseCompilerType {
+interface FinalContextType extends BaseContextType {
     utils: {
-        [ name: string ]: any
+        [name: string]: any
     }
 }
 
@@ -31,8 +31,8 @@ class MyPlugin__A {
         console.log('my plugin A options', options);
     }
 
-    apply(finalCompiler: FinalCompilerType) {
-        const { hooks, utils, Hooks } = finalCompiler;
+    apply(finalContext: FinalContextType) {
+        const { hooks, utils, Hooks } = finalContext;
 
         hooks.done.tap('my plugin A', async (data) => {
             console.log('my plugin A hook run', data);
@@ -47,11 +47,27 @@ class MyPlugin__B {
         console.log('my plugin B options', options);
     }
 
-    apply(finalCompiler: FinalCompilerType) {
-        const { hooks, utils, Hooks } = finalCompiler;
+    apply(finalContext: FinalContextType) {
+        const { hooks, utils, Hooks } = finalContext;
 
         hooks.done.tap('my plugin B', async (data) => {
             console.log('my plugin B hook run', data);
+        });
+    }
+}
+
+class MyPlugin__C {
+    constructor(options) {
+        console.log('my plugin C options', options);
+    }
+
+    name: string
+
+    apply(finalContext: FinalContextType) {
+        const { hooks, utils, Hooks } = finalContext;
+
+        hooks.done.tap('my plugin C', async (data) => {
+            console.log('my plugin C hook run', data);
         });
     }
 }
@@ -63,7 +79,9 @@ runPluginAnything(
         plugins: [
             MyPlugin__A,
 
-            [MyPlugin__B, { name: 'bbb' }]
+            [MyPlugin__B, { name: 'bbb' }],
+
+            new MyPlugin__C({ name: 'ccc' })
         ],
 
         // Array< string >
@@ -71,8 +89,8 @@ runPluginAnything(
         // Array item should be absolute folder path
         searchList: [],
 
-        async onInit(baseCompiler: BaseCompilerType) {
-            const { hooks, Hooks } = baseCompiler;
+        async onInit(baseContext: BaseContextType) {
+            const { hooks, Hooks } = baseContext;
 
             // init hooks
             Object.assign(hooks, {
@@ -81,7 +99,7 @@ runPluginAnything(
             });
 
             // add utils in compiler for lifecycle and plugins using
-            Object.assign(baseCompiler, {
+            Object.assign(baseContext, {
                 utils: {
                     aaa: 1
                 }
@@ -89,9 +107,9 @@ runPluginAnything(
         },
 
         // init lifecycle
-        async onLifecycle(finalCompiler: FinalCompilerType) {
+        async onLifecycle(finalContext: FinalContextType) {
             // compiler.utils was added in `onInit` callback.
-            const { hooks, utils, Hooks } = finalCompiler;
+            const { hooks, utils, Hooks } = finalContext;
 
             // await hooks.start.flush();
 
@@ -115,7 +133,7 @@ my plugin A hook run
 
     Absolute folder path list that will be used in searching plugins.
 
-+   `plugins: Array< string | FunctionContructor | Array<string | FunctionContructor, object> >`
++   `plugins: Array< string | FunctionContructor | { apply(data?: any): any; [ name: string ]: any } | Array<string | FunctionContructor, object> >`
 
     ```ts
     class MyPlugin {
@@ -138,9 +156,9 @@ my plugin A hook run
 
             [ 'my-plugin-1', { params: 1 } ],
 
-            MyPlugin,
+            [ MyPlugin, { params: 2 } ],
 
-            [ MyPlugin, { params: 2 } ]
+            new MyPlugin({ params: 2 })
         }
     }
     ```
@@ -151,12 +169,12 @@ my plugin A hook run
     const hookA = new Hooks();
     ```
 
-    +   `.tap(name: string, callback: Function)`
+    +   `.tap(name: string, callback: Function | Promise<any>)`
 
         Add callback at current hook event.
 
         ```ts
-        hookA.tap(name: string, callback: Function);
+        hookA.tap(name: string, callback: Function | Promise<any>);
         ```
 
     +   `.untap(name?: string)`
