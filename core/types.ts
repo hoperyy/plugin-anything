@@ -1,10 +1,14 @@
 
 export interface typeInitOptions {
     searchList?: Array<string>;
-    plugins?: Array<string | Array<any>>;
+    plugins?: Array<string | Function | object | Array<any>>;
     presets?: Array<string | Array<any>>;
     onInit?(any): any;
     onLifecycle?(any): any;
+}
+
+export interface HookConstructor {
+    new (any?);
 }
 
 export interface typeUserConfig {
@@ -56,9 +60,11 @@ export interface typeRollupConfig {
     strict?: any
 }
 
-export interface typeBaseCompilerForUser {
+
+export interface typeContext {
     hooks: object;
-    Hooks: Function,
+    Hooks: HookConstructor,
+    [ name: string ]: any,
 }
 
 export interface typeStandardPluginPresetItem {

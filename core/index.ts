@@ -5,39 +5,53 @@ import * as fs from 'fs';
 
 import { Hooks } from './hooks';
 import { toRawType, isArray, isString, isFunction, isPlainObject } from './utils';
-import { typeInitOptions, typeStandardPluginPresetItem, typePluginPresetUserItem, typeBaseCompilerForUser, typePluginPresetArray } from './types';
+import { typeInitOptions, typeStandardPluginPresetItem, typePluginPresetUserItem, typeContext, typePluginPresetArray, HookConstructor } from './types';
+
+const symbolFileModoule = Symbol('findModule');
+const symboleGetPluginList = Symbol('getPluginList');
+const symboleOptions = Symbol('options');
 
 export class PluginAnything {
-    constructor(initOptions: typeInitOptions) {
-        Object.assign(this.options, {
+    constructor() {};
+
+    [ name: string ]: any;
+
+    public Hooks = Hooks;
+
+    public async installPlugins(initOptions: typeInitOptions) {
+        Object.assign(this[symboleOptions], {
             searchList: initOptions.searchList || [],
             plugins: initOptions.plugins || [],
             presets: initOptions.presets || [],
         });
 
-        (async () => {
-            initOptions.onInit && (await initOptions.onInit(this.outerContext));
-            await this.onFlushPlugins();
-            initOptions.onLifecycle && (await initOptions.onLifecycle(this.outerContext));
-        })();
+        const plugins: typePluginPresetArray = this[symboleGetPluginList]();
+
+        plugins.map(({ value, options }) => {
+            let pluginObject;
+
+            if (isFunction(value)) {
+                const Fn: FunctionConstructor = value as FunctionConstructor;
+                pluginObject = new Fn(options);
+            } else {
+                pluginObject = value;
+            }
+
+            pluginObject.apply && pluginObject.apply(this);
+        });
     }
 
-    private outerContext: typeBaseCompilerForUser = {
-        hooks: {},
-        Hooks,
-    }
-
-    private readonly options = {
+    private readonly [symboleOptions] = {
         searchList: [],
         plugins: [],
         presets: [],
     };
 
-    private getPluginList(): typePluginPresetArray {
-        const { plugins: pluginNameList, presets: presetNameList } = this.options;
+    private [symboleGetPluginList](): typePluginPresetArray {
+        const { plugins: pluginNameList, presets: presetNameList } = this[symboleOptions];
 
         // search plugin/presets entries
-        const standardPluginList: typePluginPresetArray = pluginNameList.map(input => this.findModule(input, 'plugin')).filter(item => !!item);
+        const standardPluginList: typePluginPresetArray = pluginNameList.map(input => this[symbolFileModoule](input, 'plugin')).filter(item => !!item);
         const pluginConstructors = standardPluginList.map(({ value, options }) => {
             return {
                 value,
@@ -48,7 +62,7 @@ export class PluginAnything {
         return pluginConstructors;
     };
 
-    private findModule(input: typePluginPresetUserItem, tag: 'plugin' | 'preset'): typeStandardPluginPresetItem {
+    private [symbolFileModoule](input: typePluginPresetUserItem, tag: 'plugin' | 'preset'): typeStandardPluginPresetItem {
         let standardOutput = null;
 
         const type = toRawType(input);
@@ -105,27 +119,5 @@ export class PluginAnything {
 
         return standardOutput;
     }
-
-    private async onFlushPlugins() {
-        const plugins: typePluginPresetArray = this.getPluginList();
-
-        const promises = plugins.map(async ({ value, options }) => {
-            let pluginObject;
-
-            if (isFunction(value)) {
-                const Fn: FunctionConstructor = value as FunctionConstructor;
-                pluginObject = new Fn(options);
-            } else {
-                pluginObject = value;
-            }
-
-            pluginObject.apply && await pluginObject.apply(this.outerContext);
-        });
-
-        await Promise.all(promises);
-    }
 }
 
-export function runPluginAnything(initOptions) {
-    return new PluginAnything(initOptions);
-}
