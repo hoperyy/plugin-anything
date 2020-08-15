@@ -42,8 +42,6 @@ class MyPlugin__C {
         console.log('my plugin C options', options);
     }
 
-    name: string;
-
     apply(pluginAnythingContext) {
         const { hooks, utils, Hooks } = pluginAnythingContext;
 
