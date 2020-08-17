@@ -16,6 +16,7 @@ export class PluginAnything {
 
     [ name: string ]: any;
 
+
     public Hooks = Hooks;
 
     public async installPlugins(initOptions: typeInitOptions) {

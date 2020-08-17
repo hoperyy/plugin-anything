@@ -56,7 +56,7 @@ export class Hooks {
         }
     }
 
-    async flush(type: flushTypes = 'sync') {
+    async flush(type: flushTypes = 'sync', initData) {
         try {
             switch (type) {
                 // sync running
@@ -68,7 +68,7 @@ export class Hooks {
                             if (isPromise(callback)) {
                                 await callback as Promise<any>;
                             } else {
-                                await (callback as Function)();
+                                await (callback as Function)(initData);
                             }
                         }
                     }
@@ -77,7 +77,7 @@ export class Hooks {
                 // sync running && next hook will receive previous hook returns.
                 case 'waterfall':
                     {
-                        let preRt = undefined;
+                        let preRt = initData;
                         for (let i = 0, len = this.eventList.length; i < len; i++) {
                             const { callback } = this.eventList[i];
 
@@ -104,7 +104,7 @@ export class Hooks {
                                 if (isPromise(callback)) {
                                     resolve(callback);
                                 } else {
-                                    resolve((callback as Function)());
+                                    resolve((callback as Function)(initData));
                                 }
                             }));
                         }
