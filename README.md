@@ -5,34 +5,15 @@ Make pluginable applications.
 # Demo
 
 ```js
-const { runPluginAnything } = require('plugin-anything');
-
-interface BaseContextType {
-    readonly Hooks: FunctionConstructor;
-    hooks: {
-        [name: string]: {
-            tap: Function;
-            untap: Function;
-            flush: Function;
-        }
-    };
-    // ... for customs
-    [name: string]: any
-}
-
-interface FinalContextType extends BaseContextType {
-    utils: {
-        [name: string]: any
-    }
-}
+const { PluginAnything } = require('plugin-anything');
 
 class MyPlugin__A {
     constructor(options) {
         console.log('my plugin A options', options);
     }
 
-    apply(finalContext: FinalContextType) {
-        const { hooks, utils, Hooks } = finalContext;
+    apply(pluginAnythingContext) {
+        const { hooks, utils, Hooks } = pluginAnythingContext;
 
         hooks.done.tap('my plugin A', async (data) => {
             console.log('my plugin A hook run', data);
@@ -47,8 +28,8 @@ class MyPlugin__B {
         console.log('my plugin B options', options);
     }
 
-    apply(finalContext: FinalContextType) {
-        const { hooks, utils, Hooks } = finalContext;
+    apply(pluginAnythingContext) {
+        const { hooks, utils, Hooks } = pluginAnythingContext;
 
         hooks.done.tap('my plugin B', async (data) => {
             console.log('my plugin B hook run', data);
@@ -61,10 +42,8 @@ class MyPlugin__C {
         console.log('my plugin C options', options);
     }
 
-    name: string
-
-    apply(finalContext: FinalContextType) {
-        const { hooks, utils, Hooks } = finalContext;
+    apply(pluginAnythingContext) {
+        const { hooks, utils, Hooks } = pluginAnythingContext;
 
         hooks.done.tap('my plugin C', async (data) => {
             console.log('my plugin C hook run', data);
@@ -72,59 +51,46 @@ class MyPlugin__C {
     }
 }
 
-runPluginAnything(
-    {
 
-        // Array< string | FunctionContructor | Array<string | FunctionContructor, object> >
-        plugins: [
-            MyPlugin__A,
+const pluginAnythingContext = new PluginAnything();
 
-            [MyPlugin__B, { name: 'bbb' }],
-
-            new MyPlugin__C({ name: 'ccc' })
-        ],
-
-        // Array< string >
-        // search plugins when plugin name is string
-        // Array item should be absolute folder path
-        searchList: [],
-
-        async onInit(baseContext: BaseContextType) {
-            const { hooks, Hooks } = baseContext;
-
-            // init hooks
-            Object.assign(hooks, {
-                start: new Hooks(),
-                done: new Hooks()
-            });
-
-            // add utils in compiler for lifecycle and plugins using
-            Object.assign(baseContext, {
-                utils: {
-                    aaa: 1
-                }
-            });
-        },
-
-        // init lifecycle
-        async onLifecycle(finalContext: FinalContextType) {
-            // compiler.utils was added in `onInit` callback.
-            const { hooks, utils, Hooks } = finalContext;
-
-            // await hooks.start.flush();
-
-            // hook done won't run if it was untapped
-            await hooks.done.flush('waterfall');
-        }
+// init something into pluginAnythingContext
+Object.assign(pluginAnythingContext, {
+    utils: {
+        aaa: 1
+    },
+    hooks: {
+        start: new pluginAnythingContext.Hooks(),
+        done: new pluginAnythingContext.Hooks(),
     }
-);
+});
+
+// install plugins
+pluginAnythingContext.installPlugins({
+    // Array< string | FunctionContructor | Array<string | FunctionContructor, object> >
+    plugins: [
+        MyPlugin__A,
+        [ MyPlugin__B, { name: 'bbb' } ],
+        new MyPlugin__C({ name: 'ccc' }),
+    ],
+
+    // search plugins when plugin name is string
+    // Array< string >; Array item should be absolute folder path
+    searchList: [],
+});
+
+(async () => {
+    await pluginAnythingContext.hooks.done.flush('waterfall');
+})();
 ```
 
 ```bash
+my plugin C options { name: 'ccc' }
 my plugin A options {}
 my plugin B options { name: 'bbb' }
-my plugin B hook run
-my plugin A hook run
+my plugin A hook run undefined
+my plugin C hook run a
+my plugin B hook run undefined
 ```
 
 ## APIs

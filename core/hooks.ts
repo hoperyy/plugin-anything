@@ -1,8 +1,11 @@
 type flushTypes = 'sync' | 'waterfall' | 'paralle';
 
+type statusTypes = 'pending' | 'resolved' | 'rejected';
+
 type eventListType = Array<{ name: string, callback: Function | Promise<any> } >;
 
 import { isPromise } from './utils';
+import { isFunction } from 'util';
 
 export class Hooks {
     constructor() {
@@ -11,19 +14,26 @@ export class Hooks {
 
     eventList: eventListType = [];
 
-    tap(name: string, callback: Function | Promise<any>): any {
+    status: statusTypes = 'pending';
+
+    async tap(name: string, callback: Function | Promise<any>): Promise<any> {
         if (typeof name !== 'string') {
             throw Error('\n\n[plugin-anything] "name" should be a string in tap(name: string, callback: Function)\n\n');
         }
 
-        // if (typeof callback !== 'function') {
-        //     throw Error('\n\n[plugin-anything] "callback" should be a function in tap(name: string, callback: Function)\n\n');
-        // }
-
-        this.eventList.push({
-            name,
-            callback
-        });
+        if (this.status === 'pending') {
+            this.eventList.push({
+                name,
+                callback
+            });
+        } else {
+            // run right now like promise
+            if (isPromise(callback)) {
+                await (callback as Promise<any>);
+            } else if (isFunction(callback)) {
+                await (callback as Function)();
+            }
+        }
     }
 
     // clear eventList
@@ -47,64 +57,70 @@ export class Hooks {
     }
 
     async flush(type: flushTypes = 'sync') {
-        switch (type) {
-            // sync running
-            case 'sync':
-                {
-                    for (let i = 0, len = this.eventList.length; i < len; i++) {
-                        const { callback } = this.eventList[i];
+        try {
+            switch (type) {
+                // sync running
+                case 'sync':
+                    {
+                        for (let i = 0, len = this.eventList.length; i < len; i++) {
+                            const { callback } = this.eventList[i];
 
-                        if (isPromise(callback)) {
-                            await callback as Promise<any>;
-                        } else {
-                            await (callback as Function)(null);
-                        }
-                    }
-                }
-                break;
-
-            // sync running && next hook will receive previous hook returns.
-            case 'waterfall':
-                {
-                    let preRt = null;
-                    for (let i = 0, len = this.eventList.length; i < len; i++) {
-                        const { callback } = this.eventList[i];
-
-                        let curRt = null;
-
-                        if (isPromise(callback)) {
-                            curRt = await callback as Promise<any>;
-                        } else {
-                            curRt = await (callback as Function)(preRt);
-                        }
-
-                        preRt = curRt;
-                    }
-                }
-                break;
-            
-            // paralle running
-            case 'paralle':
-                {
-                    const promises = [];
-                    for (let i = 0, len = this.eventList.length; i < len; i++) {
-                        const { callback } = this.eventList[i];
-                        promises.push(new Promise((resolve, reject) => {
                             if (isPromise(callback)) {
-                                resolve(callback);
+                                await callback as Promise<any>;
                             } else {
-                                resolve((callback as Function)(null));
+                                await (callback as Function)();
                             }
-                        }));
+                        }
                     }
+                    break;
 
-                    await Promise.all(promises);
-                }
-                break;
+                // sync running && next hook will receive previous hook returns.
+                case 'waterfall':
+                    {
+                        let preRt = undefined;
+                        for (let i = 0, len = this.eventList.length; i < len; i++) {
+                            const { callback } = this.eventList[i];
 
-            default:
-                console.log(`[plugin-anything] flush type "${type}" is not supported.`);
-                break;
+                            let curRt = null;
+
+                            if (isPromise(callback)) {
+                                curRt = await callback as Promise<any>;
+                            } else {
+                                curRt = await (callback as Function)(preRt);
+                            }
+
+                            preRt = curRt;
+                        }
+                    }
+                    break;
+
+                // paralle running
+                case 'paralle':
+                    {
+                        const promises = [];
+                        for (let i = 0, len = this.eventList.length; i < len; i++) {
+                            const { callback } = this.eventList[i];
+                            promises.push(new Promise((resolve, reject) => {
+                                if (isPromise(callback)) {
+                                    resolve(callback);
+                                } else {
+                                    resolve((callback as Function)());
+                                }
+                            }));
+                        }
+
+                        await Promise.all(promises);
+                    }
+                    break;
+
+                default:
+                    console.log(`[plugin-anything] flush type "${type}" is not supported.`);
+                    break;
+            }
+
+            this.status = 'resolved';
+        } catch(err) {
+            this.status = 'rejected';
         }
     }
 }
