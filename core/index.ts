@@ -19,6 +19,10 @@ export class PluginAnything {
 
     public Hooks = Hooks;
 
+    public createHook() {
+        return new Hooks();
+    };
+
     public async installPlugins(initOptions: typeInitOptions) {
         Object.assign(this[symboleOptions], {
             searchList: initOptions.searchList || [],
