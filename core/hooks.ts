@@ -1,7 +1,5 @@
 type flushTypes = 'sync' | 'waterfall' | 'paralle';
 
-type statusTypes = 'pending' | 'resolved' | 'rejected';
-
 type eventListType = Array<{ name: string, callback: Function | Promise<any> } >;
 
 import { isPromise } from './utils';
@@ -14,26 +12,15 @@ export class Hooks {
 
     eventList: eventListType = [];
 
-    status: statusTypes = 'pending';
-
     async tap(name: string, callback: Function | Promise<any>): Promise<any> {
         if (typeof name !== 'string') {
             throw Error('\n\n[plugin-anything] "name" should be a string in tap(name: string, callback: Function)\n\n');
         }
 
-        if (this.status === 'pending') {
-            this.eventList.push({
-                name,
-                callback
-            });
-        } else {
-            // run right now like promise
-            if (isPromise(callback)) {
-                await (callback as Promise<any>);
-            } else if (isFunction(callback)) {
-                await (callback as Function)();
-            }
-        }
+        this.eventList.push({
+            name,
+            callback
+        });
     }
 
     // clear eventList
@@ -117,10 +104,8 @@ export class Hooks {
                     console.log(`[plugin-anything] flush type "${type}" is not supported.`);
                     break;
             }
-
-            this.status = 'resolved';
         } catch(err) {
-            this.status = 'rejected';
+            console.log(`[plugin-anything] flush error: `, err);
         }
     }
 }
