@@ -16,7 +16,12 @@ export class PluginAnything {
 
     [ name: string ]: any;
 
+
     public Hooks = Hooks;
+
+    public createHook() {
+        return new Hooks();
+    };
 
     public async installPlugins(initOptions: typeInitOptions) {
         Object.assign(this[symboleOptions], {
@@ -52,14 +57,8 @@ export class PluginAnything {
 
         // search plugin/presets entries
         const standardPluginList: typePluginPresetArray = pluginNameList.map(input => this[symbolFileModoule](input, 'plugin')).filter(item => !!item);
-        const pluginConstructors = standardPluginList.map(({ value, options }) => {
-            return {
-                value,
-                options,
-            };
-        });
 
-        return pluginConstructors;
+        return standardPluginList;
     };
 
     private [symbolFileModoule](input: typePluginPresetUserItem, tag: 'plugin' | 'preset'): typeStandardPluginPresetItem {

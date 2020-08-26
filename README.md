@@ -89,8 +89,8 @@ my plugin C options { name: 'ccc' }
 my plugin A options {}
 my plugin B options { name: 'bbb' }
 my plugin A hook run undefined
-my plugin C hook run a
-my plugin B hook run undefined
+my plugin B hook run a
+my plugin C hook run undefined
 ```
 
 ## APIs
