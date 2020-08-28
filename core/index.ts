@@ -104,7 +104,7 @@ export class PluginAnything {
                 // get absolute path
                 const packageJsonPath = path.join(curSearchPath, moduleName, 'package.json')
                 if(!fs.existsSync(packageJsonPath)) continue;
-                const packageJson = require(path.join(curSearchPath, moduleName, 'package.json'))
+                const packageJson = require(path.join(packageJsonPath))
                 const modulePath: string = path.join(curSearchPath, moduleName, `${packageJson.main}`);
 
                 if (fs.existsSync(modulePath)) {
