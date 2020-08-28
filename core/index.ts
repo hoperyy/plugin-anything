@@ -102,6 +102,8 @@ export class PluginAnything {
                 const curSearchPath: string = this[symboleOptions].searchList[i];
                 const moduleName: string = standardInput.value; // standardInput.value.indexOf(prefix) === -1 ? `${prefix}${standardInput.value}` : standardInput.value;
                 // get absolute path
+                const packageJsonPath = path.join(curSearchPath, moduleName, 'package.json')
+                if(!fs.existsSync(packageJsonPath)) continue;
                 const packageJson = require(path.join(curSearchPath, moduleName, 'package.json'))
                 const modulePath: string = path.join(curSearchPath, moduleName, `${packageJson.main}`);
 
