@@ -5,7 +5,7 @@ import * as fs from 'fs';
 
 import { Hooks } from './hooks';
 import { toRawType, isArray, isString, isFunction, isPlainObject } from './utils';
-import { typeInitOptions, typeStandardPluginPresetItem, typePluginPresetUserItem, typeContext, typePluginPresetArray, HookConstructor } from './types';
+import { typeInitOptions, typeStandardPluginPresetItem, typePluginPresetUserItem, typePluginPresetArray } from './types';
 
 const symbolFileModoule = Symbol('findModule');
 const symboleGetPluginList = Symbol('getPluginList');
@@ -98,11 +98,14 @@ export class PluginAnything {
                 options: standardInput.options,
             }
         } else if (isString(standardInput.value)) {
-            for (let i = 0, len = this.options.searchList.length; i < len; i++) {
-                const curSearchPath: string = this.options.searchList[i];
+            for (let i = 0, len = this[symboleOptions].searchList.length; i < len; i++) {
+                const curSearchPath: string = this[symboleOptions].searchList[i];
                 const moduleName: string = standardInput.value; // standardInput.value.indexOf(prefix) === -1 ? `${prefix}${standardInput.value}` : standardInput.value;
                 // get absolute path
-                const modulePath: string = path.join(curSearchPath, moduleName, 'index.js');
+                const packageJsonPath = path.join(curSearchPath, moduleName, 'package.json')
+                if(!fs.existsSync(packageJsonPath)) continue;
+                const packageJson = require(path.join(packageJsonPath))
+                const modulePath: string = path.join(curSearchPath, moduleName, `${packageJson.main}`);
 
                 if (fs.existsSync(modulePath)) {
                     const obj = require(modulePath);

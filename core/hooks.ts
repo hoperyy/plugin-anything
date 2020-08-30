@@ -3,7 +3,6 @@ type flushTypes = 'sync' | 'waterfall' | 'paralle';
 type eventListType = Array<{ name: string, callback: Function | Promise<any> } >;
 
 import { isPromise } from './utils';
-import { isFunction } from 'util';
 
 export class Hooks {
     constructor() {
@@ -43,7 +42,7 @@ export class Hooks {
         }
     }
 
-    async flush(type: flushTypes = 'sync', initData) {
+    async flush(type: flushTypes = 'sync', initData?: any) {
         try {
             switch (type) {
                 // sync running
