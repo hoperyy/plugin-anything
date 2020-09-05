@@ -52,21 +52,21 @@ class MyPlugin__C {
 }
 
 
-const pluginAnythingContext = new PluginAnything();
+const pa = new PluginAnything();
 
-// init something into pluginAnythingContext
-Object.assign(pluginAnythingContext, {
+// init something into pa
+Object.assign(pa, {
     utils: {
         aaa: 1
     },
     hooks: {
-        start: new pluginAnythingContext.Hooks(),
-        done: new pluginAnythingContext.Hooks(),
+        start: pa.createHook(),
+        done: pa.Hooks(),
     }
 });
 
 // install plugins
-pluginAnythingContext.installPlugins({
+pa.installPlugins({
     // Array< string | FunctionContructor | Array<string | FunctionContructor, object> >
     plugins: [
         MyPlugin__A,
@@ -80,7 +80,7 @@ pluginAnythingContext.installPlugins({
 });
 
 (async () => {
-    await pluginAnythingContext.hooks.done.flush('waterfall');
+    await pa.hooks.done.flush();
 })();
 ```
 
@@ -129,10 +129,10 @@ my plugin C hook run undefined
     }
     ```
 
-+   `Hooks`
++   `createHook()`
 
     ```ts
-    const hookA = new Hooks();
+    const hookA = createHook();
     ```
 
     +   `.tap(name: string, callback: Function | Promise<any>)`

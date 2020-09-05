@@ -11,6 +11,9 @@ export class Hooks {
 
     eventList: eventListType = [];
 
+    preEventList: Array<any> = [];
+    afterEventList: Array<any> = [];
+
     async tap(name: string, callback: Function | Promise<any>): Promise<any> {
         if (typeof name !== 'string') {
             throw Error('\n\n[plugin-anything] "name" should be a string in tap(name: string, callback: Function)\n\n');
@@ -42,8 +45,30 @@ export class Hooks {
         }
     }
 
+    beforeFlush(callback) {
+        this.preEventList.push(callback);
+    }
+
+    afterFlush(callback) {
+        this.afterEventList.push(callback);
+    }
+
+    async flushPreEvents() {
+        for (let i = 0, len = this.preEventList.length; i < len; i++) {
+            await this.preEventList[i]();
+        }
+    }
+
+    async flushAfterEvents() {
+        for (let i = 0, len = this.afterEventList.length; i < len; i++) {
+            await this.afterEventList[i]();
+        }
+    }
+
     async flush(type: flushTypes = 'sync', initData?: any) {
         try {
+            await this.flushPreEvents();
+
             switch (type) {
                 // sync running
                 case 'sync':
@@ -103,6 +128,8 @@ export class Hooks {
                     console.log(`[plugin-anything] flush type "${type}" is not supported.`);
                     break;
             }
+
+            await this.flushAfterEvents();
         } catch(err) {
             console.log(`[plugin-anything] flush error: `, err);
         }
