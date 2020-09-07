@@ -53,10 +53,14 @@ export class Hooks {
         this.afterEventList.push(callback);
     }
 
-    async flushPreEvents() {
+    async flushPreEvents(initData) {
+        let preRt = initData;
+
         for (let i = 0, len = this.preEventList.length; i < len; i++) {
-            await this.preEventList[i]();
+            preRt = await this.preEventList[i](preRt);
         }
+
+        return preRt;
     }
 
     async flushAfterEvents() {
@@ -67,7 +71,7 @@ export class Hooks {
 
     async flush(type: flushTypes = 'sync', initData?: any) {
         try {
-            await this.flushPreEvents();
+            const finalInitData = await this.flushPreEvents(initData);
 
             switch (type) {
                 // sync running
@@ -79,7 +83,7 @@ export class Hooks {
                             if (isPromise(callback)) {
                                 await callback as Promise<any>;
                             } else {
-                                await (callback as Function)(initData);
+                                await (callback as Function)(finalInitData);
                             }
                         }
                     }
@@ -88,7 +92,7 @@ export class Hooks {
                 // sync running && next hook will receive previous hook returns.
                 case 'waterfall':
                     {
-                        let preRt = initData;
+                        let preRt = finalInitData;
                         for (let i = 0, len = this.eventList.length; i < len; i++) {
                             const { callback } = this.eventList[i];
 
@@ -115,7 +119,7 @@ export class Hooks {
                                 if (isPromise(callback)) {
                                     resolve(callback);
                                 } else {
-                                    resolve((callback as Function)(initData));
+                                    resolve((callback as Function)(finalInitData));
                                 }
                             }));
                         }
