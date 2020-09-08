@@ -3,6 +3,7 @@ export interface typeInitOptions {
     searchList?: Array<string>;
     plugins?: Array<string | Function | object | Array<any>>;
     presets?: Array<string | Array<any>>;
+    hooks?: Array<string>;
     onInit?(any): any;
     onLifecycle?(any): any;
 }

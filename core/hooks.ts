@@ -11,6 +11,9 @@ export class Hooks {
 
     eventList: eventListType = [];
 
+    preEventList: Array<any> = [];
+    afterEventList: Array<any> = [];
+
     async tap(name: string, callback: Function | Promise<any>): Promise<any> {
         if (typeof name !== 'string') {
             throw Error('\n\n[plugin-anything] "name" should be a string in tap(name: string, callback: Function)\n\n');
@@ -42,8 +45,34 @@ export class Hooks {
         }
     }
 
+    beforeFlush(callback) {
+        this.preEventList.push(callback);
+    }
+
+    afterFlush(callback) {
+        this.afterEventList.push(callback);
+    }
+
+    async flushPreEvents(initData) {
+        let preRt = initData;
+
+        for (let i = 0, len = this.preEventList.length; i < len; i++) {
+            preRt = await this.preEventList[i](preRt);
+        }
+
+        return preRt;
+    }
+
+    async flushAfterEvents() {
+        for (let i = 0, len = this.afterEventList.length; i < len; i++) {
+            await this.afterEventList[i]();
+        }
+    }
+
     async flush(type: flushTypes = 'sync', initData?: any) {
         try {
+            const finalInitData = await this.flushPreEvents(initData);
+
             switch (type) {
                 // sync running
                 case 'sync':
@@ -54,7 +83,7 @@ export class Hooks {
                             if (isPromise(callback)) {
                                 await callback as Promise<any>;
                             } else {
-                                await (callback as Function)(initData);
+                                await (callback as Function)(finalInitData);
                             }
                         }
                     }
@@ -63,7 +92,7 @@ export class Hooks {
                 // sync running && next hook will receive previous hook returns.
                 case 'waterfall':
                     {
-                        let preRt = initData;
+                        let preRt = finalInitData;
                         for (let i = 0, len = this.eventList.length; i < len; i++) {
                             const { callback } = this.eventList[i];
 
@@ -90,7 +119,7 @@ export class Hooks {
                                 if (isPromise(callback)) {
                                     resolve(callback);
                                 } else {
-                                    resolve((callback as Function)(initData));
+                                    resolve((callback as Function)(finalInitData));
                                 }
                             }));
                         }
@@ -103,6 +132,8 @@ export class Hooks {
                     console.log(`[plugin-anything] flush type "${type}" is not supported.`);
                     break;
             }
+
+            await this.flushAfterEvents();
         } catch(err) {
             console.log(`[plugin-anything] flush error: `, err);
         }
