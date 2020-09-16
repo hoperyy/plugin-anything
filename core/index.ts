@@ -16,14 +16,13 @@ export class PluginAnything {
 
     [ name: string ]: any;
 
-
     public Hooks = Hooks;
 
     public createHook() {
         return new Hooks();
     };
 
-    public async installPlugins(initOptions: typeInitOptions) {
+    public installPlugins(initOptions: typeInitOptions) {
         Object.assign(this[symboleOptions], {
             searchList: initOptions.searchList || [],
             plugins: initOptions.plugins || [],
@@ -103,7 +102,11 @@ export class PluginAnything {
                 const moduleName: string = standardInput.value; // standardInput.value.indexOf(prefix) === -1 ? `${prefix}${standardInput.value}` : standardInput.value;
                 // get absolute path
                 const packageJsonPath = path.join(curSearchPath, moduleName, 'package.json')
-                if(!fs.existsSync(packageJsonPath)) continue;
+
+                if(!fs.existsSync(packageJsonPath)) {
+                    continue
+                }
+
                 const packageJson = require(path.join(packageJsonPath))
                 const modulePath: string = path.join(curSearchPath, moduleName, `${packageJson.main}`);
 
@@ -113,8 +116,7 @@ export class PluginAnything {
                         value: obj.default || obj,
                         options: standardInput.options,
                     }
-
-                    break;
+                    break
                 }
             }
         }
