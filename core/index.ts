@@ -16,7 +16,13 @@ export class PluginAnything {
 
     [ name: string ]: any;
 
-    public Hooks = Hooks;
+    public clearHooks(hooks) {
+        const names = Object.keys(hooks);
+
+        for (let i = 0, len = names.length; i < len; i++) {
+            hooks[names[i]].clear();
+        }
+    }
 
     public createHook() {
         return new Hooks();
@@ -31,7 +37,7 @@ export class PluginAnything {
 
         const plugins: typePluginPresetArray = this[symboleGetPluginList]();
 
-        plugins.map(({ value, options }) => {
+        plugins.forEach(({ value, options }) => {
             let pluginObject;
 
             if (isFunction(value)) {
@@ -101,22 +107,26 @@ export class PluginAnything {
                 const curSearchPath: string = this[symboleOptions].searchList[i];
                 const moduleName: string = standardInput.value; // standardInput.value.indexOf(prefix) === -1 ? `${prefix}${standardInput.value}` : standardInput.value;
                 // get absolute path
-                const packageJsonPath = path.join(curSearchPath, moduleName, 'package.json')
+                const packageJsonPath = path.join(curSearchPath, moduleName, 'package.json');
+                const indexFilePath = path.join(curSearchPath, moduleName, 'index.js');
+                let modulePath: string = '';
 
-                if(!fs.existsSync(packageJsonPath)) {
-                    continue
+                if (fs.existsSync(packageJsonPath)) {
+                    const packageJson = require(path.join(packageJsonPath))
+                    modulePath = path.join(curSearchPath, moduleName, `${packageJson.main}`);
+                } else if (fs.existsSync(indexFilePath)) {
+                    modulePath = indexFilePath;
+                } else {
+                    continue;
                 }
 
-                const packageJson = require(path.join(packageJsonPath))
-                const modulePath: string = path.join(curSearchPath, moduleName, `${packageJson.main}`);
-
-                if (fs.existsSync(modulePath)) {
+                if (modulePath && fs.existsSync(modulePath)) {
                     const obj = require(modulePath);
                     standardOutput = {
                         value: obj.default || obj,
                         options: standardInput.options,
                     }
-                    break
+                    break;
                 }
             }
         }

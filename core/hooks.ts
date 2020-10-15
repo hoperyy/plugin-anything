@@ -14,6 +14,10 @@ export class Hooks {
     preEventList: Array<any> = [];
     afterEventList: Array<any> = [];
 
+    clear() {
+        this.eventList = [];
+    }
+
     async tap(name: string, callback: Function | Promise<any>): Promise<any> {
         if (typeof name !== 'string') {
             throw Error('\n\n[plugin-anything] "name" should be a string in tap(name: string, callback: Function)\n\n');
@@ -77,7 +81,7 @@ export class Hooks {
                 // sync running
                 case 'sync':
                     {
-                        for (let i = 0, len = this.eventList.length; i < len; i++) {
+                        for (let i = 0; i < this.eventList.length; i++) {
                             const { callback } = this.eventList[i];
 
                             if (isPromise(callback)) {
@@ -93,7 +97,7 @@ export class Hooks {
                 case 'waterfall':
                     {
                         let preRt = finalInitData;
-                        for (let i = 0, len = this.eventList.length; i < len; i++) {
+                        for (let i = 0; i < this.eventList.length; i++) {
                             const { callback } = this.eventList[i];
 
                             let curRt = null;
@@ -113,7 +117,7 @@ export class Hooks {
                 case 'paralle':
                     {
                         const promises = [];
-                        for (let i = 0, len = this.eventList.length; i < len; i++) {
+                        for (let i = 0; i < this.eventList.length; i++) {
                             const { callback } = this.eventList[i];
                             promises.push(new Promise((resolve, reject) => {
                                 if (isPromise(callback)) {
