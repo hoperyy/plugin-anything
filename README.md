@@ -178,6 +178,35 @@ my plugin C hook run undefined
 
             run all callbacks at the same time.
 
+    +   `hook.beforeFlush(callback)` and `hook.afterFlush(callback)`
+
+        regist callback **before** and **after** `flush`.
+
+        callback should be a `Function` with return type `any | Promise<any>`.
+
+        example:
+
+        ```js
+        (async () => {
+            hook.beforeFlush(async () => {
+                console.log('before flush');
+            });
+
+            hook.afterFlush(async () => {
+                console.log('after flush');
+            });
+
+            await hook.flush();
+        })();
+
+        // result
+        log: before flush
+
+        flushing...
+
+        log: after flush
+        ```
+
 # LICENSE
 
 MIT
