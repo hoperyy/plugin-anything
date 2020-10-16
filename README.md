@@ -164,7 +164,7 @@ my plugin C hook run undefined
 
         Run all callbacks.
 
-        +   `sync`
+        +   `sync` (default)
 
             run callbacks one next one.
 
