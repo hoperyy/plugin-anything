@@ -12,8 +12,8 @@ class MyPlugin__A {
         console.log('my plugin A options', options);
     }
 
-    apply(pluginAnythingContext) {
-        const { hooks, utils, Hooks } = pluginAnythingContext;
+    apply(pa) {
+        const { hooks, utils, Hooks } = pa;
 
         hooks.done.tap('my plugin A', async (data) => {
             console.log('my plugin A hook run', data);
@@ -28,8 +28,8 @@ class MyPlugin__B {
         console.log('my plugin B options', options);
     }
 
-    apply(pluginAnythingContext) {
-        const { hooks, utils, Hooks } = pluginAnythingContext;
+    apply(pa) {
+        const { hooks, utils, Hooks } = pa;
 
         hooks.done.tap('my plugin B', async (data) => {
             console.log('my plugin B hook run', data);
@@ -42,8 +42,8 @@ class MyPlugin__C {
         console.log('my plugin C options', options);
     }
 
-    apply(pluginAnythingContext) {
-        const { hooks, utils, Hooks } = pluginAnythingContext;
+    apply(pa) {
+        const { hooks, utils, Hooks } = pa;
 
         hooks.done.tap('my plugin C', async (data) => {
             console.log('my plugin C hook run', data);
@@ -54,7 +54,7 @@ class MyPlugin__C {
 
 const pa = new PluginAnything();
 
-// init something into pa
+// init anything into pa
 Object.assign(pa, {
     utils: {
         aaa: 1
@@ -79,6 +79,7 @@ pa.installPlugins({
     searchList: [],
 });
 
+// run events defined in plugins
 (async () => {
     await pa.hooks.done.flush();
 })();
@@ -99,6 +100,15 @@ my plugin C hook run undefined
 
     Absolute folder path list that will be used in searching plugins.
 
+    examples:
+
+    ```js
+    [
+        '/path_a/node_modules',
+        '/path_b/node_modules'
+    ]
+    ```
+
 +   `plugins: Array< string | FunctionContructor | { apply(data?: any): any; [ name: string ]: any } | Array<string | FunctionContructor, object> >`
 
     ```ts
@@ -109,7 +119,7 @@ my plugin C hook run undefined
 
         options: {};
 
-        apply(compiler) {
+        apply(pa) {
 
         }
     }
@@ -132,26 +142,42 @@ my plugin C hook run undefined
 +   `createHook()`
 
     ```ts
-    const hookA = createHook();
+    const hook = createHook();
     ```
 
-    +   `.tap(name: string, callback: Function | Promise<any>)`
+    +   `hook.tap(name: string, callback: Function | Promise<any>)`
 
         Add callback at current hook event.
 
+        `name` could be any string for event description.
+
         ```ts
-        hookA.tap(name: string, callback: Function | Promise<any>);
+        hook.tap(name: string, callback: Function | Promise<any>);
         ```
 
-    +   `.untap(name?: string)`
+    +   `hook..untap(name?: string)`
 
         Remove callback list whose name equals `name`.
 
         When `name` is blank, clear callback list.
 
-    +   `.flush(type?: sync | waterfall | paralle)`
+    +   `hook..flush(type?: sync | waterfall | paralle)`
 
         Run all callbacks.
+
+        +   `sync`
+
+            run callbacks one next one.
+
+        +   `waterfall`
+
+            run callbacks one next none.
+
+            and previous returned value will be parameter of next callback.
+
+        +   `paralle`
+
+            run all callbacks at the same time.
 
 # LICENSE
 
