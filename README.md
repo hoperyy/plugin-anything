@@ -154,17 +154,13 @@ my plugin C hook run undefined
 
         `name` could be any string for event description.
 
-        ```ts
-        hook.tap(name: string, callback: Function | Promise<any>);
-        ```
-
-    +   `hook..untap(name?: string)`
+    +   `hook.untap(name?: string)`
 
         Remove callback list whose name equals `name`.
 
         When `name` is blank, clear callback list.
 
-    +   `hook..flush(type?: sync | waterfall | paralle)`
+    +   `hook.flush(type?: sync | waterfall | paralle)`
 
         Run all callbacks.
 
