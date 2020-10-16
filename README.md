@@ -61,7 +61,7 @@ Object.assign(pa, {
     },
     hooks: {
         start: pa.createHook(),
-        done: pa.Hooks(),
+        done: pa.createHook(),
     }
 });
 
@@ -86,9 +86,12 @@ pa.installPlugins({
 ```
 
 ```bash
+# because of `new MyPlugin__C({ name: 'ccc' })` runs first
 my plugin C options { name: 'ccc' }
 my plugin A options {}
 my plugin B options { name: 'bbb' }
+
+# event 'done' callbacks
 my plugin A hook run undefined
 my plugin B hook run a
 my plugin C hook run undefined
