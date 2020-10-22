@@ -1,4 +1,4 @@
-type flushTypes = 'sync' | 'waterfall' | 'paralle';
+type flushTypes = 'sync' | 'waterfall' | 'paralle' | 'paralle-sync';
 
 type eventListType = Array<{ name: string, callback: Function | Promise<any> } >;
 
@@ -73,7 +73,7 @@ export class Hooks {
         }
     }
 
-    async flush(type: flushTypes = 'sync', initData?: any) {
+    async flush(type: flushTypes = 'sync', initData?: any, paralleLimit = 3) {
         try {
             const finalInitData = await this.flushPreEvents(initData);
 
@@ -129,6 +129,33 @@ export class Hooks {
                         }
 
                         await Promise.all(promises);
+                    }
+                    break;
+
+                case 'paralle-sync':
+                    {
+                        const promises = [];
+                        for (let i = 0; i < this.eventList.length; i = i + paralleLimit) {
+                            const eventPartList = this.eventList.slice(i, i + paralleLimit);
+                            const subPromises = [];
+
+                            for (let k = 0, lenK = eventPartList.length; k < lenK; k++ ) {
+                                const { callback } = eventPartList[k];
+                                subPromises.push(new Promise((resolve, reject) => {
+                                    if (isPromise(callback)) {
+                                        resolve(callback);
+                                    } else {
+                                        resolve((callback as Function)(finalInitData));
+                                    }
+                                }));
+                            }
+                            
+                            promises.push(subPromises);
+                        }
+
+                        for (let i = 0, len = promises.length; i < len; i++) {
+                            await Promise.all(promises[i]);
+                        }
                     }
                     break;
 

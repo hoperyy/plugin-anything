@@ -51,36 +51,40 @@ class MyPlugin__C {
     }
 }
 
+function initHooks() {
+    const pa = new PluginAnything();
 
-const pa = new PluginAnything();
+    // init anything into pa
+    Object.assign(pa, {
+        utils: {
+            aaa: 1
+        },
+        hooks: {
+            start: pa.createHook(),
+            done: pa.createHook(),
+        }
+    });
 
-// init anything into pa
-Object.assign(pa, {
-    utils: {
-        aaa: 1
-    },
-    hooks: {
-        start: pa.createHook(),
-        done: pa.createHook(),
-    }
-});
+    // install plugins
+    pa.installPlugins({
+        // Array< string | FunctionContructor | Array<string | FunctionContructor, object> >
+        plugins: [
+            MyPlugin__A,
+            [ MyPlugin__B, { name: 'bbb' } ],
+            new MyPlugin__C({ name: 'ccc' }),
+        ],
 
-// install plugins
-pa.installPlugins({
-    // Array< string | FunctionContructor | Array<string | FunctionContructor, object> >
-    plugins: [
-        MyPlugin__A,
-        [ MyPlugin__B, { name: 'bbb' } ],
-        new MyPlugin__C({ name: 'ccc' }),
-    ],
+        // search plugins when plugin name is string
+        // Array< string >; Array item should be absolute folder path
+        searchList: [],
+    });
 
-    // search plugins when plugin name is string
-    // Array< string >; Array item should be absolute folder path
-    searchList: [],
-});
+    return pa;
+}
 
 // run events defined in plugins
 (async () => {
+    const pa = initHooks();
     await pa.hooks.done.flush();
 })();
 ```
@@ -160,7 +164,7 @@ my plugin C hook run undefined
 
         When `name` is blank, clear callback list.
 
-    +   `hook.flush(type?: sync | waterfall | paralle)`
+    +   `hook.flush(type?: sync | waterfall | paralle, initData?: any, paralleLimit = 3)`
 
         Run all callbacks.
 
@@ -177,6 +181,18 @@ my plugin C hook run undefined
         +   `paralle`
 
             run all callbacks at the same time.
+
+        +   `paralle-sync`
+
+            run callbacks by sync sequences:
+
+            ```sh
+            [ callback1, callback2, cakkback3 ]
+
+            [ callback4, ... ]
+
+            ...
+            ```
 
     +   `hook.beforeFlush(callback)` and `hook.afterFlush(callback)`
 
