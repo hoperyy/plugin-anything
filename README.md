@@ -13,7 +13,7 @@ class MyPlugin__A {
     }
 
     apply(pa) {
-        const { hooks, utils, Hooks } = pa;
+        const { hooks, utils } = pa;
 
         hooks.done.tap('my plugin A', async (data) => {
             console.log('my plugin A hook run', data);
@@ -29,7 +29,7 @@ class MyPlugin__B {
     }
 
     apply(pa) {
-        const { hooks, utils, Hooks } = pa;
+        const { hooks, utils } = pa;
 
         hooks.done.tap('my plugin B', async (data) => {
             console.log('my plugin B hook run', data);
@@ -43,7 +43,7 @@ class MyPlugin__C {
     }
 
     apply(pa) {
-        const { hooks, utils, Hooks } = pa;
+        const { hooks, utils } = pa;
 
         hooks.done.tap('my plugin C', async (data) => {
             console.log('my plugin C hook run', data);
