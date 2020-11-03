@@ -1,12 +1,12 @@
 {
   "name": "plugin-anything",
-  "version": "2.0.8",
+  "version": "2.0.18",
   "description": "",
   "main": "core/index.js",
   "scripts": {
     "prepublishOnly": "tsc",
     "tsc:watch": "tsc -w",
-    "dev": "node demo/index.js"
+    "test": "node demo/index.js"
   },
   "repository": {
     "type": "git",

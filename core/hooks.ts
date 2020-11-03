@@ -1,4 +1,4 @@
-type flushTypes = 'sync' | 'waterfall' | 'paralle';
+type flushTypes = 'sync' | 'waterfall' | 'paralle' | 'paralle-sync';
 
 type eventListType = Array<{ name: string, callback: Function | Promise<any> } >;
 
@@ -13,6 +13,10 @@ export class Hooks {
 
     preEventList: Array<any> = [];
     afterEventList: Array<any> = [];
+
+    clear() {
+        this.eventList = [];
+    }
 
     async tap(name: string, callback: Function | Promise<any>): Promise<any> {
         if (typeof name !== 'string') {
@@ -69,7 +73,7 @@ export class Hooks {
         }
     }
 
-    async flush(type: flushTypes = 'sync', initData?: any) {
+    async flush(type: flushTypes = 'sync', initData?: any, paralleLimit = 3) {
         try {
             const finalInitData = await this.flushPreEvents(initData);
 
@@ -77,7 +81,7 @@ export class Hooks {
                 // sync running
                 case 'sync':
                     {
-                        for (let i = 0, len = this.eventList.length; i < len; i++) {
+                        for (let i = 0; i < this.eventList.length; i++) {
                             const { callback } = this.eventList[i];
 
                             if (isPromise(callback)) {
@@ -93,7 +97,7 @@ export class Hooks {
                 case 'waterfall':
                     {
                         let preRt = finalInitData;
-                        for (let i = 0, len = this.eventList.length; i < len; i++) {
+                        for (let i = 0; i < this.eventList.length; i++) {
                             const { callback } = this.eventList[i];
 
                             let curRt = null;
@@ -113,7 +117,7 @@ export class Hooks {
                 case 'paralle':
                     {
                         const promises = [];
-                        for (let i = 0, len = this.eventList.length; i < len; i++) {
+                        for (let i = 0; i < this.eventList.length; i++) {
                             const { callback } = this.eventList[i];
                             promises.push(new Promise((resolve, reject) => {
                                 if (isPromise(callback)) {
@@ -125,6 +129,33 @@ export class Hooks {
                         }
 
                         await Promise.all(promises);
+                    }
+                    break;
+
+                case 'paralle-sync':
+                    {
+                        const promises = [];
+                        for (let i = 0; i < this.eventList.length; i = i + paralleLimit) {
+                            const eventPartList = this.eventList.slice(i, i + paralleLimit);
+                            const subPromises = [];
+
+                            for (let k = 0, lenK = eventPartList.length; k < lenK; k++ ) {
+                                const { callback } = eventPartList[k];
+                                subPromises.push(new Promise((resolve, reject) => {
+                                    if (isPromise(callback)) {
+                                        resolve(callback);
+                                    } else {
+                                        resolve((callback as Function)(finalInitData));
+                                    }
+                                }));
+                            }
+                            
+                            promises.push(subPromises);
+                        }
+
+                        for (let i = 0, len = promises.length; i < len; i++) {
+                            await Promise.all(promises[i]);
+                        }
                     }
                     break;
 

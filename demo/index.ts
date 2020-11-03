@@ -3,15 +3,14 @@ import { PluginAnything } from '../core/index';
 
 class MyPlugin__A {
     constructor(options) {
-        console.log('my plugin A options', options);
+        // console.log('my plugin A options', options);
     }
 
-    apply(pluginAnythingContext) {
-        const { hooks, utils, Hooks } = pluginAnythingContext;
+    apply(pa) {
+        const { hooks, utils, Hooks } = pa;
 
         hooks.done.tap('my plugin A', async (data) => {
-            console.log('my plugin A hook run', data);
-
+            // console.log('my plugin A hook run', data);
             return 'a';
         });
     }
@@ -19,50 +18,50 @@ class MyPlugin__A {
 
 class MyPlugin__B {
     constructor(options) {
-        console.log('my plugin B options', options);
+        // console.log('my plugin B options', options);
     }
 
-    apply(pluginAnythingContext) {
-        const { hooks, utils, Hooks } = pluginAnythingContext;
+    apply(pa) {
+        const { hooks, utils, Hooks } = pa;
 
         hooks.done.tap('my plugin B', async (data) => {
-            console.log('my plugin B hook run', data);
+            // console.log('my plugin B hook run', data);
         });
     }
 }
 
 class MyPlugin__C {
     constructor(options) {
-        console.log('my plugin C options', options);
+        // console.log('my plugin C options', options);
     }
 
     name: string;
 
-    apply(pluginAnythingContext) {
-        const { hooks, utils, Hooks } = pluginAnythingContext;
+    apply(pa) {
+        const { hooks, utils, Hooks } = pa;
 
         hooks.done.tap('my plugin C', async (data) => {
-            console.log('my plugin C hook run', data);
+            // console.log('my plugin C hook run', data);
         });
     }
 }
 
 
-const pluginAnythingContext = new PluginAnything();
+const pa = new PluginAnything();
 
-// init something into pluginAnythingContext
-Object.assign(pluginAnythingContext, {
+// init something into pa
+Object.assign(pa, {
     utils: {
         aaa: 1
     },
     hooks: {
-        start: new pluginAnythingContext.Hooks(),
-        done: new pluginAnythingContext.Hooks(),
+        start: pa.createHook(),
+        done: pa.createHook(),
     }
 });
 
 // install plugins
-pluginAnythingContext.installPlugins({
+pa.installPlugins({
     // Array< string | FunctionContructor | Array<string | FunctionContructor, object> >
     plugins: [
         MyPlugin__A,
@@ -76,5 +75,5 @@ pluginAnythingContext.installPlugins({
 });
 
 (async () => {
-    await pluginAnythingContext.hooks.done.flush('waterfall');
+    await pa.hooks.done.flush('paralle-sync', null, 2);
 })();
