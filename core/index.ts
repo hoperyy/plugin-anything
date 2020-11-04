@@ -117,7 +117,12 @@ export class PluginAnything {
 
                 if (fs.existsSync(packageJsonPath)) {
                     const packageJson = require(path.join(packageJsonPath))
-                    modulePath = path.join(curSearchPath, moduleName, `${packageJson.main}`);
+
+                    if (packageJson.main) {
+                        modulePath = path.join(curSearchPath, moduleName, `${packageJson.main}`);
+                    } else {
+                        modulePath = indexFilePath;
+                    }
                 } else if (fs.existsSync(indexFilePath)) {
                     modulePath = indexFilePath;
                 } else {
