@@ -28,7 +28,7 @@ export class PluginAnything {
         return new Hooks();
     };
 
-    public installPlugins(initOptions: typeInitOptions) {
+    public installPlugins(initOptions: typeInitOptions): Array<{ [name: string]: any }> {
         Object.assign(this[symboleOptions], {
             searchList: initOptions.searchList || [],
             plugins: initOptions.plugins || [],
@@ -37,7 +37,7 @@ export class PluginAnything {
 
         const plugins: typePluginPresetArray = this[symboleGetPluginList]();
 
-        plugins.forEach(({ value, options }) => {
+        const rt = plugins.map(({ value, options }) => {
             let pluginObject;
 
             if (isFunction(value)) {
@@ -48,7 +48,11 @@ export class PluginAnything {
             }
 
             pluginObject.apply && pluginObject.apply(this);
+
+            return pluginObject;
         });
+
+        return rt;
     }
 
     private readonly [symboleOptions] = {

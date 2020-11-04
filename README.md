@@ -37,20 +37,6 @@ class MyPlugin__B {
     }
 }
 
-class MyPlugin__C {
-    constructor(options) {
-        console.log('my plugin C options', options);
-    }
-
-    apply(pa) {
-        const { hooks, utils } = pa;
-
-        hooks.done.tap('my plugin C', async (data) => {
-            console.log('my plugin C hook run', data);
-        });
-    }
-}
-
 function initHooks() {
     const pa = new PluginAnything();
 
@@ -66,18 +52,20 @@ function initHooks() {
     });
 
     // install plugins
-    pa.installPlugins({
+    const plugins = pa.installPlugins({
         // Array< string | FunctionContructor | Array<string | FunctionContructor, object> >
         plugins: [
             MyPlugin__A,
-            [ MyPlugin__B, { name: 'bbb' } ],
-            new MyPlugin__C({ name: 'ccc' }),
+            [ MyPlugin__B, { name: 'b__1' } ],
+            new MyPlugin__B({ name: 'b__2' }),
         ],
 
         // search plugins when plugin name is string
         // Array< string >; Array item should be absolute folder path
         searchList: [],
     });
+
+    console.log(plugins);
 
     return pa;
 }
@@ -103,7 +91,11 @@ my plugin C hook run undefined
 
 ## APIs
 
-+   `searchList`: Array< string >
+```js
+const pa = new PluginAnything(options: { [name: string]: any });
+```
+
++   `options.searchList`: Array< string >
 
     Absolute folder path list that will be used in searching plugins.
 
@@ -116,7 +108,7 @@ my plugin C hook run undefined
     ]
     ```
 
-+   `plugins: Array< string | FunctionContructor | { apply(data?: any): any; [ name: string ]: any } | Array<string | FunctionContructor, object> >`
++   `options.plugins: Array< string | FunctionContructor | { apply(data?: any): any; [ name: string ]: any } | Array<string | FunctionContructor, object> >`
 
     ```ts
     class MyPlugin {
@@ -146,11 +138,17 @@ my plugin C hook run undefined
     }
     ```
 
-+   `createHook()`
++   `pa.installPlugins(): Array<{ [name: string]: any }>`
+
+    Install plugins and return plugin list.
+
++   `pa.createHook()`
 
     ```ts
     const hook = createHook();
     ```
+
+    create a hook.
 
     +   `hook.tap(name: string, callback: Function | Promise<any>)`
 
