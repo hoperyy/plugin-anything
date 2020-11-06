@@ -65,8 +65,6 @@ function initHooks() {
         searchList: [],
     });
 
-    console.log(plugins);
-
     return pa;
 }
 
