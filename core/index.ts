@@ -29,6 +29,7 @@ export class PluginAnything {
     };
 
     public installPlugins(initOptions: typeInitOptions) {
+        // merge config
         Object.assign(this[symboleOptions], {
             searchList: initOptions.searchList || [],
             plugins: initOptions.plugins || [],

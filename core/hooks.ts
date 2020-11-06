@@ -1,6 +1,6 @@
 type flushTypes = 'sync' | 'waterfall' | 'paralle' | 'paralle-sync';
 
-type eventListType = Array<{ name: string, callback: Function | Promise<any> } >;
+type eventListType = Array<{ name: string, callback: Function | Promise<any> }>;
 
 import { isPromise } from './utils';
 
@@ -14,6 +14,7 @@ export class Hooks {
     preEventList: Array<any> = [];
     afterEventList: Array<any> = [];
 
+    // clear eventList
     clear() {
         this.eventList = [];
     }
@@ -29,7 +30,6 @@ export class Hooks {
         });
     }
 
-    // clear eventList
     untap(eventName?: string) {
         if (!eventName) {
             this.eventList = [];
@@ -67,15 +67,18 @@ export class Hooks {
         return preRt;
     }
 
-    async flushAfterEvents() {
+    async flushAfterEvents(finalData) {
+        let finalRt = finalData;
+
         for (let i = 0, len = this.afterEventList.length; i < len; i++) {
-            await this.afterEventList[i]();
+            finalRt = await this.afterEventList[i](finalData);
         }
     }
 
     async flush(type: flushTypes = 'sync', initData?: any, paralleLimit = 3) {
         try {
             const finalInitData = await this.flushPreEvents(initData);
+            let finalData = finalInitData;
 
             switch (type) {
                 // sync running
@@ -109,6 +112,7 @@ export class Hooks {
                             }
 
                             preRt = curRt;
+                            finalData = curRt;
                         }
                     }
                     break;
@@ -139,7 +143,7 @@ export class Hooks {
                             const eventPartList = this.eventList.slice(i, i + paralleLimit);
                             const subPromises = [];
 
-                            for (let k = 0, lenK = eventPartList.length; k < lenK; k++ ) {
+                            for (let k = 0, lenK = eventPartList.length; k < lenK; k++) {
                                 const { callback } = eventPartList[k];
                                 subPromises.push(new Promise((resolve, reject) => {
                                     if (isPromise(callback)) {
@@ -149,7 +153,7 @@ export class Hooks {
                                     }
                                 }));
                             }
-                            
+
                             promises.push(subPromises);
                         }
 
@@ -164,8 +168,8 @@ export class Hooks {
                     break;
             }
 
-            await this.flushAfterEvents();
-        } catch(err) {
+            await this.flushAfterEvents(finalData);
+        } catch (err) {
             console.log(`[plugin-anything] flush error: `, err);
         }
     }
