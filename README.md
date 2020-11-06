@@ -13,9 +13,9 @@ class MyPlugin__A {
     }
 
     apply(pa) {
-        const { hooks, utils } = pa;
+        const { myHooks, myUtils } = pa;
 
-        hooks.done.tap('my plugin A', async (data) => {
+        myHooks.done.tap('my plugin A', async (data) => {
             console.log('my plugin A hook run', data);
 
             return 'a';
@@ -29,9 +29,9 @@ class MyPlugin__B {
     }
 
     apply(pa) {
-        const { hooks, utils } = pa;
+        const { myHooks, myUtils } = pa;
 
-        hooks.done.tap('my plugin B', async (data) => {
+        myHooks.done.tap('my plugin B', async (data) => {
             console.log('my plugin B hook run', data);
         });
     }
@@ -42,10 +42,10 @@ function initHooks() {
 
     // init anything into pa
     Object.assign(pa, {
-        utils: {
+        myUtils: {
             aaa: 1
         },
-        hooks: {
+        myHooks: {
             start: pa.createHook(),
             done: pa.createHook(),
         }
@@ -73,7 +73,7 @@ function initHooks() {
 // run events defined in plugins
 (async () => {
     const pa = initHooks();
-    await pa.hooks.done.flush();
+    await pa.myHooks.done.flush();
 })();
 ```
 
