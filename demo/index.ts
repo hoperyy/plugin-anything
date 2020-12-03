@@ -75,5 +75,5 @@ pa.installPlugins({
 });
 
 (async () => {
-    await pa.hooks.done.flush('paralle-sync', null, 2);
+    await pa.hooks.done.flush('paralle-sync', { initData: null, paralleLimit: 2 });
 })();

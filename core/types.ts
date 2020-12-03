@@ -37,3 +37,5 @@ export interface typeStandardPluginPresetItem {
     value: FunctionConstructor | { apply: (data?: any) => any, [name: string]: any };
     options: any;
 }
+
+export type eventListType = Array<{ name: string, callback: Function | Promise<any> }>;
