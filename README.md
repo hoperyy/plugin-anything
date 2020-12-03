@@ -52,7 +52,7 @@ function initHooks() {
     });
 
     // install plugins
-    const plugins = pa.installPlugins({
+    const plugins = pa.install({
         // Array< string | FunctionContructor | Array<string | FunctionContructor, object> >
         plugins: [
             MyPlugin__A,
@@ -136,7 +136,7 @@ const pa = new PluginAnything(options: { [name: string]: any });
     }
     ```
 
-+   `pa.installPlugins(): Array<{ [name: string]: any }>`
++   `pa.install(): Array<{ [name: string]: any }>`
 
     Install plugins and return plugin list.
 

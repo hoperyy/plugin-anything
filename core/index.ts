@@ -28,7 +28,12 @@ export class PluginAnything {
         return new Hooks();
     };
 
-    public installPlugins(initOptions: typeInitOptions): Array<{ [name: string]: any }> {
+    // for old api
+    public installPlugins(initOptions: typeInitOptions) {
+        return this.install(initOptions);
+    }
+
+    public install(initOptions: typeInitOptions): Array<{ [name: string]: any }> {
         Object.assign(this[symboleOptions], {
             searchList: initOptions.searchList || [],
             plugins: initOptions.plugins || [],
