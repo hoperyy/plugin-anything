@@ -73,9 +73,7 @@ export class Hooks {
         }
     }
 
-    async flush(type: flushTypes = 'sync', { paralleLimit = 3, initData = undefined, callback = (name: string, data?: any) => {} } = {}) {
-        const everyCallback = callback;
-
+    async flush(type: flushTypes = 'sync', { paralleLimit = 3, initData = undefined, before = (name: string, data?: any) => { }, after = (name: string, data?: any) => {} } = {}) {
         try {
             const finalInitData = await this.flushPreEvents(initData);
 
@@ -86,13 +84,15 @@ export class Hooks {
                         for (let i = 0; i < this.eventList.length; i++) {
                             const { callback, name } = this.eventList[i];
 
+                            before(name);
+
                             if (isPromise(callback)) {
                                 await callback as Promise<any>;
                             } else {
                                 await (callback as Function)(finalInitData);
                             }
 
-                            everyCallback(name);
+                            after(name);
                         }
                     }
                     break;
@@ -106,13 +106,15 @@ export class Hooks {
 
                             let curRt = null;
 
+                            before(name);
+
                             if (isPromise(callback)) {
                                 curRt = await callback as Promise<any>;
                             } else {
                                 curRt = await (callback as Function)(preRt);
                             }
 
-                            everyCallback(name, curRt);
+                            after(name, curRt);
 
                             preRt = curRt;
                         }
@@ -127,12 +129,14 @@ export class Hooks {
                             const { callback, name } = this.eventList[i];
                             promises.push(new Promise(async (resolve, reject) => {
                                 if (isPromise(callback)) {
+                                    before(name);
                                     await callback;
-                                    everyCallback(name);
+                                    after(name);
                                     resolve();
                                 } else {
+                                    before(name);
                                     await (callback as Function)(finalInitData);
-                                    everyCallback(name);
+                                    after(name);
                                     resolve();
                                 }
                             }));
@@ -153,12 +157,14 @@ export class Hooks {
                                 const { callback, name } = eventPartList[k];
                                 subPromises.push(new Promise(async (resolve, reject) => {
                                     if (isPromise(callback)) {
+                                        before(name);
                                         await callback;
-                                        everyCallback(name);
+                                        after(name);
                                         resolve();
                                     } else {
+                                        before(name);
                                         await (callback as Function)(finalInitData);
-                                        everyCallback(name);
+                                        after(name);
                                         resolve();
                                     }
                                 }));
