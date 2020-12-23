@@ -51,7 +51,7 @@ function isPlainObject(value): boolean {
  * @returns {Boolean}
  */
 function isPromise(value): boolean {
-    return toRawType(value) === 'promise';
+    return isObject(value) && isFunction(value.then) && isFunction(value.catch);
 }
 
 export {
