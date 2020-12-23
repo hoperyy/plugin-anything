@@ -14,6 +14,10 @@ export class Hooks {
     preEventList: Array<any> = [];
     afterEventList: Array<any> = [];
 
+    private beforeEveryFlushCallback = (name): any => {};
+
+    private afterEveryFlushCallback = (name): any => {};
+
     clear() {
         this.eventList = [];
     }
@@ -57,6 +61,14 @@ export class Hooks {
         this.afterEventList.push(callback);
     }
 
+    beforeEveryFlush(callback) {
+        this.beforeEveryFlushCallback = callback;
+    }
+
+    afterEveryFlush(callback) {
+        this.afterEveryFlushCallback = callback;
+    }
+
     async flushPreEvents(initData) {
         let preRt = initData;
 
@@ -85,6 +97,7 @@ export class Hooks {
                             const { callback, name } = this.eventList[i];
 
                             before(name);
+                            this.beforeEveryFlushCallback(name);
 
                             if (isPromise(callback)) {
                                 await callback as Promise<any>;
@@ -93,6 +106,7 @@ export class Hooks {
                             }
 
                             after(name);
+                            this.afterEveryFlushCallback(name);
                         }
                     }
                     break;
@@ -107,6 +121,7 @@ export class Hooks {
                             let curRt = null;
 
                             before(name);
+                            this.beforeEveryFlushCallback(name);
 
                             if (isPromise(callback)) {
                                 curRt = await callback as Promise<any>;
@@ -115,6 +130,7 @@ export class Hooks {
                             }
 
                             after(name, curRt);
+                            this.afterEveryFlushCallback(name);
 
                             preRt = curRt;
                         }
@@ -129,14 +145,25 @@ export class Hooks {
                             const { callback, name } = this.eventList[i];
                             promises.push(new Promise(async (resolve, reject) => {
                                 if (isPromise(callback)) {
+
                                     before(name);
+                                    this.beforeEveryFlushCallback(name);
+
                                     await callback;
+
                                     after(name);
+                                    this.afterEveryFlushCallback(name);
+
                                     resolve();
                                 } else {
                                     before(name);
+                                    this.beforeEveryFlushCallback(name);
+
                                     await (callback as Function)(finalInitData);
+
                                     after(name);
+                                    this.afterEveryFlushCallback(name);
+
                                     resolve();
                                 }
                             }));
@@ -158,13 +185,23 @@ export class Hooks {
                                 subPromises.push(new Promise(async (resolve, reject) => {
                                     if (isPromise(callback)) {
                                         before(name);
+                                        this.beforeEveryFlushCallback(name);
+
                                         await callback;
+
                                         after(name);
+                                        this.afterEveryFlushCallback(name);
+
                                         resolve();
                                     } else {
                                         before(name);
+                                        this.beforeEveryFlushCallback(name);
+
                                         await (callback as Function)(finalInitData);
+
                                         after(name);
+                                        this.afterEveryFlushCallback(name);
+                                        
                                         resolve();
                                     }
                                 }));
@@ -186,7 +223,7 @@ export class Hooks {
 
             await this.flushAfterEvents();
         } catch(err) {
-            console.log(`[plugin-anything] flush error: `, err);
+            throw new Error(err);
         }
     }
 }
