@@ -14,9 +14,9 @@ export class Hooks {
     preEventList: Array<any> = [];
     afterEventList: Array<any> = [];
 
-    private beforeEveryFlushCallback = (name): any => {};
+    public beforeEveryFlushCallback = (name): any => {};
 
-    private afterEveryFlushCallback = (name): any => {};
+    public afterEveryFlushCallback = (name): any => {};
 
     clear() {
         this.eventList = [];
@@ -61,11 +61,11 @@ export class Hooks {
         this.afterEventList.push(callback);
     }
 
-    beforeEveryFlush(callback) {
+    public beforeEveryFlush(callback) {
         this.beforeEveryFlushCallback = callback;
     }
 
-    afterEveryFlush(callback) {
+    public afterEveryFlush(callback) {
         this.afterEveryFlushCallback = callback;
     }
 
