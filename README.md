@@ -4,7 +4,7 @@ Make pluginable applications.
 
 # How does it work ?
 
-![](./imgs/intro.png)
+<img style="width: 100%" src="./imgs/intro.png">
 
 # Demo
 
