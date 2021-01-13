@@ -2,6 +2,10 @@
 
 Make pluginable applications.
 
+# How does it work ?
+
+![](./imgs/intro.jpg)
+
 # Demo
 
 ```js

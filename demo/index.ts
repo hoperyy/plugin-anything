@@ -61,7 +61,7 @@ Object.assign(pa, {
 });
 
 // install plugins
-pa.installPlugins({
+pa.install({
     // Array< string | FunctionContructor | Array<string | FunctionContructor, object> >
     plugins: [
         MyPlugin__A,

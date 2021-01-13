@@ -14,9 +14,9 @@ export class Hooks {
     preEventList: Array<any> = [];
     afterEventList: Array<any> = [];
 
-    public beforeEveryFlushCallback = (name): any => {};
+    beforeEveryFlushCallback = (name): any => {};
 
-    public afterEveryFlushCallback = (name): any => {};
+    afterEveryFlushCallback = (name): any => {};
 
     clear() {
         this.eventList = [];
@@ -61,11 +61,11 @@ export class Hooks {
         this.afterEventList.push(callback);
     }
 
-    public beforeEveryFlush(callback) {
+    beforeEveryFlush(callback) {
         this.beforeEveryFlushCallback = callback;
     }
 
-    public afterEveryFlush(callback) {
+    afterEveryFlush(callback) {
         this.afterEveryFlushCallback = callback;
     }
 
@@ -143,7 +143,7 @@ export class Hooks {
                         const promises = [];
                         for (let i = 0; i < this.eventList.length; i++) {
                             const { callback, name } = this.eventList[i];
-                            promises.push(new Promise(async (resolve, reject) => {
+                            promises.push(new Promise<void>(async (resolve, reject) => {
                                 if (isPromise(callback)) {
 
                                     before(name);
@@ -182,7 +182,7 @@ export class Hooks {
 
                             for (let k = 0, lenK = eventPartList.length; k < lenK; k++ ) {
                                 const { callback, name } = eventPartList[k];
-                                subPromises.push(new Promise(async (resolve, reject) => {
+                                subPromises.push(new Promise<void>(async (resolve, reject) => {
                                     if (isPromise(callback)) {
                                         before(name);
                                         this.beforeEveryFlushCallback(name);
