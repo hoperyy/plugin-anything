@@ -4,7 +4,7 @@ Make pluginable applications.
 
 # How does it work ?
 
-![](./imgs/intro.jpg)
+![](./imgs/intro.png)
 
 # Demo
 
