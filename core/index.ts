@@ -43,18 +43,23 @@ export class PluginAnything {
         const plugins: typePluginPresetArray = this[symboleGetPluginList]();
 
         const rt = plugins.map(({ value, options }) => {
-            let pluginObject;
+            try {
+                let pluginObject;
 
-            if (isFunction(value)) {
-                const Fn: FunctionConstructor = value as FunctionConstructor;
-                pluginObject = new Fn(options);
-            } else {
-                pluginObject = value;
+                if (isFunction(value)) {
+                    const Fn: FunctionConstructor = value as FunctionConstructor;
+                    pluginObject = new Fn(options);
+                } else {
+                    pluginObject = value;
+                }
+
+                pluginObject.apply && pluginObject.apply(this);
+
+                return pluginObject;
+            } catch(err) {
+                initOptions.onError && initOptions.onError(err);
+                return null;
             }
-
-            pluginObject.apply && pluginObject.apply(this);
-
-            return pluginObject;
         });
 
         return rt;

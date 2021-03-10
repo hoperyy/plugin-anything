@@ -6,6 +6,7 @@ export interface typeInitOptions {
     hooks?: Array<string>;
     onInit?(any): any;
     onLifecycle?(any): any;
+    onError?(any): any;
 }
 
 export interface HookConstructor {

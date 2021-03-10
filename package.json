@@ -5,7 +5,7 @@
   "main": "core/index.js",
   "scripts": {
     "prepublishOnly": "tsc",
-    "tsc:watch": "tsc -w",
+    "tsw": "tsc -w",
     "test": "node demo/index.js"
   },
   "repository": {
