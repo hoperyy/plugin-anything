@@ -97,7 +97,7 @@ export class Hooks {
                             const { callback, name } = this.eventList[i];
 
                             before(name);
-                            this.beforeEveryFlushCallback(name);
+                            await this.beforeEveryFlushCallback(name);
 
                             if (isPromise(callback)) {
                                 await callback as Promise<any>;
@@ -106,7 +106,7 @@ export class Hooks {
                             }
 
                             after(name);
-                            this.afterEveryFlushCallback(name);
+                            await this.afterEveryFlushCallback(name);
                         }
                     }
                     break;
@@ -121,7 +121,7 @@ export class Hooks {
                             let curRt = null;
 
                             before(name);
-                            this.beforeEveryFlushCallback(name);
+                            await this.beforeEveryFlushCallback(name);
 
                             if (isPromise(callback)) {
                                 curRt = await callback as Promise<any>;
@@ -130,7 +130,7 @@ export class Hooks {
                             }
 
                             after(name, curRt);
-                            this.afterEveryFlushCallback(name);
+                            await this.afterEveryFlushCallback(name);
 
                             preRt = curRt;
                         }
@@ -147,22 +147,22 @@ export class Hooks {
                                 if (isPromise(callback)) {
 
                                     before(name);
-                                    this.beforeEveryFlushCallback(name);
+                                    await this.beforeEveryFlushCallback(name);
 
                                     await callback;
 
                                     after(name);
-                                    this.afterEveryFlushCallback(name);
+                                    await this.afterEveryFlushCallback(name);
 
                                     resolve();
                                 } else {
                                     before(name);
-                                    this.beforeEveryFlushCallback(name);
+                                    await this.beforeEveryFlushCallback(name);
 
                                     await (callback as Function)(finalInitData);
 
                                     after(name);
-                                    this.afterEveryFlushCallback(name);
+                                    await this.afterEveryFlushCallback(name);
 
                                     resolve();
                                 }
@@ -185,22 +185,22 @@ export class Hooks {
                                 subPromises.push(new Promise<void>(async (resolve, reject) => {
                                     if (isPromise(callback)) {
                                         before(name);
-                                        this.beforeEveryFlushCallback(name);
+                                        await this.beforeEveryFlushCallback(name);
 
                                         await callback;
 
                                         after(name);
-                                        this.afterEveryFlushCallback(name);
+                                        await this.afterEveryFlushCallback(name);
 
                                         resolve();
                                     } else {
                                         before(name);
-                                        this.beforeEveryFlushCallback(name);
+                                        await this.beforeEveryFlushCallback(name);
 
                                         await (callback as Function)(finalInitData);
 
                                         after(name);
-                                        this.afterEveryFlushCallback(name);
+                                        await this.afterEveryFlushCallback(name);
                                         
                                         resolve();
                                     }
