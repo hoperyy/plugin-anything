@@ -164,7 +164,7 @@ const pa = new PluginAnything(options: { [name: string]: any });
 
         When `name` is blank, clear callback list.
 
-    +   `hook.flush(type?: sync | waterfall | paralle, initData?: any, paralleLimit = 3)`
+    +   `hook.flush(type?: sync | waterfall | paralle, initData?: skip = false, paralleLimit = 3)`
 
         Run all callbacks.
 

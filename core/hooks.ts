@@ -85,7 +85,7 @@ export class Hooks {
         }
     }
 
-    async flush(type: flushTypes = 'sync', { paralleLimit = 3, initData = undefined, before = (name: string, data?: any) => { }, after = (name: string, data?: any) => {} } = {}) {
+    async flush(type: flushTypes = 'sync', { paralleLimit = 3, skip = false, initData = undefined, before = (name: string, data?: any) => { }, after = (name: string, data?: any) => {} } = {}) {
         try {
             const finalInitData = await this.flushPreEvents(initData);
 
@@ -99,10 +99,12 @@ export class Hooks {
                             before(name);
                             await this.beforeEveryFlushCallback(name);
 
-                            if (isPromise(callback)) {
-                                await callback as Promise<any>;
-                            } else {
-                                await (callback as Function)(finalInitData);
+                            if (!skip) {
+                                if (isPromise(callback)) {
+                                    await callback as Promise<any>;
+                                } else {
+                                    await (callback as Function)(finalInitData);
+                                }
                             }
 
                             after(name);
@@ -123,10 +125,12 @@ export class Hooks {
                             before(name);
                             await this.beforeEveryFlushCallback(name);
 
-                            if (isPromise(callback)) {
-                                curRt = await callback as Promise<any>;
-                            } else {
-                                curRt = await (callback as Function)(preRt);
+                            if (!skip) {
+                                if (isPromise(callback)) {
+                                    curRt = await callback as Promise<any>;
+                                } else {
+                                    curRt = await (callback as Function)(preRt);
+                                }
                             }
 
                             after(name, curRt);
@@ -149,7 +153,9 @@ export class Hooks {
                                     before(name);
                                     await this.beforeEveryFlushCallback(name);
 
-                                    await callback;
+                                    if (!skip) {
+                                        await callback;
+                                    }
 
                                     after(name);
                                     await this.afterEveryFlushCallback(name);
@@ -159,7 +165,9 @@ export class Hooks {
                                     before(name);
                                     await this.beforeEveryFlushCallback(name);
 
-                                    await (callback as Function)(finalInitData);
+                                    if (!skip) {
+                                        await (callback as Function)(finalInitData);
+                                    }
 
                                     after(name);
                                     await this.afterEveryFlushCallback(name);
@@ -187,7 +195,9 @@ export class Hooks {
                                         before(name);
                                         await this.beforeEveryFlushCallback(name);
 
-                                        await callback;
+                                        if (!skip) {
+                                            await callback;
+                                        }
 
                                         after(name);
                                         await this.afterEveryFlushCallback(name);
@@ -197,7 +207,9 @@ export class Hooks {
                                         before(name);
                                         await this.beforeEveryFlushCallback(name);
 
-                                        await (callback as Function)(finalInitData);
+                                        if (!skip) {
+                                            await (callback as Function)(finalInitData);
+                                        }
 
                                         after(name);
                                         await this.afterEveryFlushCallback(name);
