@@ -240,10 +240,10 @@ export class Hooks {
             await this.flushAfterEvents();
         } catch(err) {
             if (this.onErrorHandler) {
-                this.onErrorHandler(err);
-            } else {
-                throw new Error(err);
+                await this.onErrorHandler(err);
             }
+
+            throw new Error(err);
         }
     }
 }
