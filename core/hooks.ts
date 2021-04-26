@@ -7,6 +7,12 @@ import { isPromise } from './utils';
 export class Hooks {
     constructor() {}
 
+    public onError(callback) {
+        this.onErrorHandler = callback;
+    }
+
+    private onErrorHandler = null
+
     public eventList: eventListType = [];
 
     public preEventList: Array<any> = [];
@@ -233,7 +239,11 @@ export class Hooks {
 
             await this.flushAfterEvents();
         } catch(err) {
-            throw new Error(err);
+            if (this.onErrorHandler) {
+                this.onErrorHandler(err);
+            } else {
+                throw new Error(err);
+            }
         }
     }
 }
