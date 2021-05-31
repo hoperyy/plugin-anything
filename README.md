@@ -4,7 +4,7 @@ Make pluginable applications.
 
 # How does it work ?
 
-<img style="width: 100%" src="./imgs/intro.jpg">
+<img style="width: 100%" src="./imgs/intro.png">
 
 # Demo
 
