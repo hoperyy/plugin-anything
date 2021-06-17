@@ -57,12 +57,13 @@ export class PluginAnything {
 
                 return pluginObject;
             } catch(err) {
+                console.log(err);
                 initOptions.onError && initOptions.onError(err);
                 return null;
             }
         });
 
-        return rt;
+        return rt.filter(item => !!item);
     }
 
     private readonly [symboleOptions] = {
