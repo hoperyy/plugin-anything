@@ -9,95 +9,94 @@ Make pluginable applications.
 # Demo
 
 ```js
-const { PluginAnything } = require('plugin-anything');
-
-class MyPlugin__A {
+// Custom Plugins
+class CustomPluginA {
     constructor(options) {
-        console.log('my plugin A options', options);
+        console.log('CustomPluginA options', options);
     }
 
-    apply(pa) {
-        const { myHooks, myUtils } = pa;
-
-        myHooks.done.tap('my plugin A', async (data) => {
-            console.log('my plugin A hook run', data);
-
+    apply(customApp) {
+        customApp.hooks.hookA.tap('my plugin A', async (data) => {
+            console.log('CustomPluginA runs', data);
             return 'a';
         });
     }
 }
 
-class MyPlugin__B {
+class CustomPluginB {
     constructor(options) {
-        console.log('my plugin B options', options);
+        console.log('CustomPluginB options', options);
     }
 
-    apply(pa) {
-        const { myHooks, myUtils } = pa;
-
-        myHooks.done.tap('my plugin B', async (data) => {
-            console.log('my plugin B hook run', data);
+    apply(customApp) {
+        customApp.hooks.hookB.tap('my plugin B', async (data) => {
+            console.log('CustomPluginB runs', data);
         });
     }
 }
 
-function initHooks() {
-    const pa = new PluginAnything();
+// Custom App
+const { PluginAnything } = require('plugin-anything');
+class CustomApp extends PluginAnything {
+    constructor() {
+        super();
 
-    // init anything into pa
-    Object.assign(pa, {
-        myUtils: {
-            aaa: 1
-        },
-        myHooks: {
-            start: pa.createHook(),
-            done: pa.createHook(),
+        // define hooks for plugin using
+        this.hooks = {
+            hookA: new this.createHook(), // 'createHook' inherits from PluginAnything
+            hookB: new this.createHook(), // 'createHook' inherits from PluginAnything
         }
-    });
 
-    // install plugins
-    const plugins = pa.install({
-        // Array< string | FunctionContructor | Array<string | FunctionContructor, object> >
-        plugins: [
-            MyPlugin__A,
-            [ MyPlugin__B, { name: 'b__1' } ],
-            new MyPlugin__B({ name: 'b__2' }),
-        ],
+        this.install({
+            plugins: [ CustomPluginA, CustomPluginB ],
+        })
 
-        // search plugins when plugin name is string
-        // Array< string >; Array item should be absolute folder path
-        searchList: [],
-    });
+        (async () => {
+            // mock wait 2s
+            await new Promise(resolve => setTimeout(resolve, 2000))
+            await this.hooks.hookA.flush();
 
-    return pa;
+            // mock wait 2s
+            await new Promise(resolve => setTimeout(resolve, 2000))
+            await this.hooks.hookB.flush();
+        })()
+    }
+
+    hooks = null;
 }
 
-// run events defined in plugins
-(async () => {
-    const pa = initHooks();
-    await pa.myHooks.done.flush();
-})();
+new CustomApp();
 ```
 
 ```bash
-# because of `new MyPlugin__C({ name: 'ccc' })` runs first
-my plugin C options { name: 'ccc' }
-my plugin A options {}
-my plugin B options { name: 'bbb' }
+CustomPluginA options {}
+CustomPluginB options {}
 
-# event 'done' callbacks
-my plugin A hook run undefined
-my plugin B hook run a
-my plugin C hook run undefined
+# wait 2s
+CustomPluginA runs
+# wait 2s
+CustomPluginB runs
 ```
 
 ## APIs
 
 ```js
-const pa = new PluginAnything(options: { [name: string]: any });
+const pluginAnything = new PluginAnything(options: { [name: string]: any });
 ```
 
-+   `options.searchList`: Array< string >
+### Plugins Handler: `pluginAnything.install(initOptions: typeInitOptions): Array<{ [name: string]: any }>`
+
+```typescript
+interface typeInitOptions {
+    searchList?: Array<string>;
+    plugins?: Array<string | Function | object | Array<any>>;
+    presets?: Array<string | Array<any>>;
+}
+```
+
+Install plugins and return plugin list.
+
++   `initOptions.searchList`: Array< string >
 
     Absolute folder path list that will be used in searching plugins.
 
@@ -110,7 +109,7 @@ const pa = new PluginAnything(options: { [name: string]: any });
     ]
     ```
 
-+   `options.plugins: Array< string | FunctionContructor | { apply(data?: any): any; [ name: string ]: any } | Array<string | FunctionContructor, object> >`
++   `initOptions.plugins: Array< string | FunctionContructor | { apply(data?: any): any; [ name: string ]: any } | Array<string | FunctionContructor, object> >`
 
     ```ts
     class MyPlugin {
@@ -127,101 +126,95 @@ const pa = new PluginAnything(options: { [name: string]: any });
 
 
     // config demo
-    {
-        plugins: {
-            'my-plugin-0',
+    plugins: {
+        'my-plugin-0',
 
-            [ 'my-plugin-1', { params: 1 } ],
+        [ 'my-plugin-1', { params: 1 } ],
 
-            [ MyPlugin, { params: 2 } ],
+        [ MyPlugin, { params: 2 } ],
 
-            new MyPlugin({ params: 2 })
-        }
+        new MyPlugin({ params: 2 })
     }
     ```
 
-+   `pa.install(): Array<{ [name: string]: any }>`
+### Hook Handler: `pluginAnything.createHook()`
 
-    Install plugins and return plugin list.
+```ts
+const hook = createHook();
+```
 
-+   `pa.createHook()`
+create a hook.
 
-    ```ts
-    const hook = createHook();
-    ```
++   `hook.tap(name: string, callback: Function | Promise<any>)`
 
-    create a hook.
+    Add callback at current hook event.
 
-    +   `hook.tap(name: string, callback: Function | Promise<any>)`
+    `name` could be any string for event description.
 
-        Add callback at current hook event.
++   `hook.untap(name?: string)`
 
-        `name` could be any string for event description.
+    Remove callback list whose name equals `name`.
 
-    +   `hook.untap(name?: string)`
+    When `name` is blank, clear callback list.
 
-        Remove callback list whose name equals `name`.
++   `hook.flush(type?: sync | waterfall | paralle, initData?: skip = false, paralleLimit = 3)`
 
-        When `name` is blank, clear callback list.
+    Run all callbacks.
 
-    +   `hook.flush(type?: sync | waterfall | paralle, initData?: skip = false, paralleLimit = 3)`
+    +   `sync` (default)
 
-        Run all callbacks.
+        run callbacks one next one.
 
-        +   `sync` (default)
+    +   `waterfall`
 
-            run callbacks one next one.
+        run callbacks one next none.
 
-        +   `waterfall`
+        and previous returned value will be parameter of next callback.
 
-            run callbacks one next none.
+    +   `paralle`
 
-            and previous returned value will be parameter of next callback.
+        run all callbacks at the same time.
 
-        +   `paralle`
+    +   `paralle-sync`
 
-            run all callbacks at the same time.
+        run callbacks by sync sequences:
 
-        +   `paralle-sync`
+        ```sh
+        [ callback1, callback2, cakkback3 ]
 
-            run callbacks by sync sequences:
+        [ callback4, ... ]
 
-            ```sh
-            [ callback1, callback2, cakkback3 ]
-
-            [ callback4, ... ]
-
-            ...
-            ```
-
-    +   `hook.beforeFlush(callback)` and `hook.afterFlush(callback)`
-
-        regist callback **before** and **after** `flush`.
-
-        callback should be a `Function` with return type `any | Promise<any>`.
-
-        example:
-
-        ```js
-        (async () => {
-            hook.beforeFlush(async () => {
-                console.log('before flush');
-            });
-
-            hook.afterFlush(async () => {
-                console.log('after flush');
-            });
-
-            await hook.flush();
-        })();
-
-        // result
-        log: before flush
-
-        flushing...
-
-        log: after flush
+        ...
         ```
+
++   `hook.beforeFlush(callback)` and `hook.afterFlush(callback)`
+
+    regist callback **before** and **after** `flush`.
+
+    callback should be a `Function` with return type `any | Promise<any>`.
+
+    example:
+
+    ```js
+    (async () => {
+        hook.beforeFlush(async () => {
+            console.log('before flush');
+        });
+
+        hook.afterFlush(async () => {
+            console.log('after flush');
+        });
+
+        await hook.flush();
+    })();
+
+    // result
+    log: before flush
+
+    flushing...
+
+    log: after flush
+    ```
 
 # LICENSE
 
