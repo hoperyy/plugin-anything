@@ -84,59 +84,6 @@ CustomPluginB runs
 const pluginAnything = new PluginAnything(options: { [name: string]: any });
 ```
 
-### Plugins Handler: `pluginAnything.install(initOptions: typeInitOptions): Array<{ [name: string]: any }>`
-
-```typescript
-interface typeInitOptions {
-    searchList?: Array<string>;
-    plugins?: Array<string | Function | object | Array<any>>;
-    presets?: Array<string | Array<any>>;
-}
-```
-
-Install plugins and return plugin list.
-
-+   `initOptions.searchList`: Array< string >
-
-    Absolute folder path list that will be used in searching plugins.
-
-    examples:
-
-    ```js
-    [
-        '/path_a/node_modules',
-        '/path_b/node_modules'
-    ]
-    ```
-
-+   `initOptions.plugins: Array< string | FunctionContructor | { apply(data?: any): any; [ name: string ]: any } | Array<string | FunctionContructor, object> >`
-
-    ```ts
-    class MyPlugin {
-        constructor(options) {
-            this.options = options;
-        };
-
-        options: {};
-
-        apply(pa) {
-
-        }
-    }
-
-
-    // config demo
-    plugins: {
-        'my-plugin-0',
-
-        [ 'my-plugin-1', { params: 1 } ],
-
-        [ MyPlugin, { params: 2 } ],
-
-        new MyPlugin({ params: 2 })
-    }
-    ```
-
 ### Hook Handler: `pluginAnything.createHook()`
 
 ```ts
@@ -214,6 +161,59 @@ create a hook.
     flushing...
 
     log: after flush
+    ```
+
+### Plugins Handler: `pluginAnything.install(initOptions: typeInitOptions): Array<{ [name: string]: any }>`
+
+```typescript
+interface typeInitOptions {
+    searchList?: Array<string>;
+    plugins?: Array<string | Function | object | Array<any>>;
+    presets?: Array<string | Array<any>>;
+}
+```
+
+Install plugins and return plugin list.
+
++   `initOptions.searchList`: Array< string >
+
+    Absolute folder path list that will be used in searching plugins.
+
+    examples:
+
+    ```js
+    [
+        '/path_a/node_modules',
+        '/path_b/node_modules'
+    ]
+    ```
+
++   `initOptions.plugins: Array< string | FunctionContructor | { apply(data?: any): any; [ name: string ]: any } | Array<string | FunctionContructor, object> >`
+
+    ```ts
+    class MyPlugin {
+        constructor(options) {
+            this.options = options;
+        };
+
+        options: {};
+
+        apply(pa) {
+
+        }
+    }
+
+
+    // config demo
+    plugins: {
+        'my-plugin-0',
+
+        [ 'my-plugin-1', { params: 1 } ],
+
+        [ MyPlugin, { params: 2 } ],
+
+        new MyPlugin({ params: 2 })
+    }
     ```
 
 # LICENSE
