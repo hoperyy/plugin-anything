@@ -43,8 +43,8 @@ class CustomApp extends PluginAnything {
 
         // define hooks for plugin using
         this.hooks = {
-            hookA: new this.createHook(), // 'createHook' inherits from PluginAnything
-            hookB: new this.createHook(), // 'createHook' inherits from PluginAnything
+            hookA: this.createHook(), // 'createHook' inherits from PluginAnything
+            hookB: this.createHook(), // 'createHook' inherits from PluginAnything
         }
 
         this.install({
